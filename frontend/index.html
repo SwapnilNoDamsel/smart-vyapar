@@ -1231,8 +1231,15 @@ refreshStock();
 .checkout-box h3{font-size:22px;margin-bottom:14px}.checkout-box input,.checkout-box textarea{width:100%;padding:11px;margin:6px 0 10px;border:1.5px solid #22281F;border-radius:8px;font:14px inherit}.checkout-actions{display:flex;gap:8px;margin-top:8px}.checkout-actions button{flex:1}.cart-items{font:12px monospace;background:#F6F2E9;border-radius:8px;padding:10px;margin-bottom:12px}.cart-items div{display:flex;justify-content:space-between;margin:4px 0}
 </style><div id="cartBar">🛒 Cart <span id="cartCount">0</span> · ₹<span id="cartTotal">0</span></div><div id="appToast"></div><div id="checkoutModal"><div class="checkout-box"><h3>Complete your order</h3><div id="cartItems" class="cart-items"></div><input id="customerName" placeholder="Your name"><input id="customerPhone" placeholder="Phone number"><textarea id="customerAddress" rows="3" placeholder="Delivery address"></textarea><div class="checkout-actions"><button class="btn" id="closeCheckout">Cancel</button><button class="btn dark" id="placeOrder">Place order</button></div></div></div>
 <script id="smart-vyapar-api">
-const API=''; const SHOP_ID=Number(new URLSearchParams(location.search).get('shop')) || 1; let cart=[];
-const toast=(m)=>{const x=document.getElementById('appToast');x.textContent=m;x.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.style.display='none',2200)};
+const API = '';
+
+const pathMatch = window.location.pathname.match(/^\/shop\/(\d+)\/?$/);
+
+const SHOP_ID =
+  Number(new URLSearchParams(window.location.search).get('shop')) ||
+  (pathMatch ? Number(pathMatch[1]) : 1);
+
+console.log('Smart Vyapar Shop ID:', SHOP_ID);const toast=(m)=>{const x=document.getElementById('appToast');x.textContent=m;x.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.style.display='none',2200)};
 async function api(path,opts={}){const r=await fetch(API+path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.message||'Request failed');return data}
 function money(n){return '₹'+Number(n||0).toLocaleString('en-IN')}
 function updateCart(){const bar=document.getElementById('cartBar');const count=cart.reduce((s,i)=>s+i.quantity,0);const total=cart.reduce((s,i)=>s+i.quantity*i.price,0);bar.style.display=count?'block':'none';document.getElementById('cartCount').textContent=count;document.getElementById('cartTotal').textContent=total}

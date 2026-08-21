@@ -203,8 +203,24 @@ app.post('/api/shops', async (req, res) => {
     await db.query(`ALTER TABLE products ADD COLUMN emoji VARCHAR(20) DEFAULT '📦' AFTER category`);
   }
 
-  const [vendors] = await db.query('SELECT id FROM vendors ORDER BY id LIMIT 1');
-  const vendorId = vendors[0]?.id;
+ const [vendors] = await db.query(
+  'SELECT id FROM vendors ORDER BY id LIMIT 1'
+);
+
+let vendorId = vendors[0]?.id;
+
+if (!vendorId) {
+  const [vendorResult] = await db.query(
+    'INSERT INTO vendors (name, phone, email) VALUES (?, ?, ?)',
+    [
+      b.shop_name.trim() + ' Owner',
+      b.contact || '0000000000',
+      null
+    ]
+  );
+
+  vendorId = vendorResult.insertId;
+}
   const token = 'SHOP-' + crypto.randomBytes(5).toString('hex').toUpperCase();
   const [r] = await db.query(`INSERT INTO shops (vendor_id,shop_name,logo,location,contact,opening_time,closing_time,category,upi_id,qr_token,is_published) VALUES (?,?,?,?,?,?,?,?,?,?,TRUE)`, [vendorId, b.shop_name.trim(), b.logo || '🥭', b.location || '', b.contact || '', b.opening_time || '', b.closing_time || '', b.category || 'Grocery & Kirana', b.upi_id || '', token]);
   const shop = await getShop(r.insertId);
