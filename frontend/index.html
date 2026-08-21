@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Vyapar — Every Local Shop, One Scan Away</title>
@@ -360,6 +361,7 @@ footer{ background:var(--indigo); color:var(--paper); padding:52px 0 30px; margi
 .foot-list{ list-style:none; font-size:13px; display:flex; flex-direction:column; gap:8px; color:#D8E0EC; }
 .foot-bottom{ margin-top:36px; padding-top:18px; border-top:1px solid rgba(255,255,255,0.15); font-family:var(--font-mono); font-size:11px; color:#93A2B8; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -541,12 +543,11 @@ footer{ background:var(--indigo); color:var(--paper); padding:52px 0 30px; margi
       </div>
     </div>
     <div class="qr-stage reveal">
-      <div class="qr-box" id="qrBox">
-        <div class="qr-scan-line"></div>
-        <svg viewBox="0 0 29 29" id="qrSvg"></svg>
-      </div>
-      <div class="qr-caption" id="qrCaption" data-i18n="qr_prompt">Tap the code to simulate a customer scan →</div>
-    </div>
+      <div class="qr-box" id="qrBox"></div>
+
+<div class="qr-caption" id="qrCaption">
+    Scan to open this shop
+</div>
   </div>
 </section>
 
@@ -1231,15 +1232,41 @@ refreshStock();
 .checkout-box h3{font-size:22px;margin-bottom:14px}.checkout-box input,.checkout-box textarea{width:100%;padding:11px;margin:6px 0 10px;border:1.5px solid #22281F;border-radius:8px;font:14px inherit}.checkout-actions{display:flex;gap:8px;margin-top:8px}.checkout-actions button{flex:1}.cart-items{font:12px monospace;background:#F6F2E9;border-radius:8px;padding:10px;margin-bottom:12px}.cart-items div{display:flex;justify-content:space-between;margin:4px 0}
 </style><div id="cartBar">🛒 Cart <span id="cartCount">0</span> · ₹<span id="cartTotal">0</span></div><div id="appToast"></div><div id="checkoutModal"><div class="checkout-box"><h3>Complete your order</h3><div id="cartItems" class="cart-items"></div><input id="customerName" placeholder="Your name"><input id="customerPhone" placeholder="Phone number"><textarea id="customerAddress" rows="3" placeholder="Delivery address"></textarea><div class="checkout-actions"><button class="btn" id="closeCheckout">Cancel</button><button class="btn dark" id="placeOrder">Place order</button></div></div></div>
 <script id="smart-vyapar-api">
-const API = '';
+const API='';
 
-const pathMatch = window.location.pathname.match(/^\/shop\/(\d+)\/?$/);
+const pathShopId = location.pathname.match(/^\/shop\/(\d+)/);
+const queryShopId = new URLSearchParams(location.search).get('shop');
 
-const SHOP_ID =
-  Number(new URLSearchParams(window.location.search).get('shop')) ||
-  (pathMatch ? Number(pathMatch[1]) : 1);
+const SHOP_ID = Number(
+  pathShopId?.[1] || queryShopId || 1
+);
 
-console.log('Smart Vyapar Shop ID:', SHOP_ID);const toast=(m)=>{const x=document.getElementById('appToast');x.textContent=m;x.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.style.display='none',2200)};
+let cart=[];
+function generateShopQR() {
+    const qrBox = document.getElementById('qrBox');
+
+    if (!qrBox) return;
+
+    qrBox.innerHTML = '';
+
+    const shopUrl = `${window.location.origin}/shop/${SHOP_ID}`;
+
+    new QRCode(qrBox, {
+        text: shopUrl,
+        width: 220,
+        height: 220,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    const qrCaption = document.getElementById('qrCaption');
+
+    if (qrCaption) {
+        qrCaption.textContent = `Scan to open shop/${SHOP_ID}`;
+    }
+}
+const toast=(m)=>{const x=document.getElementById('appToast');x.textContent=m;x.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.style.display='none',2200)};
 async function api(path,opts={}){const r=await fetch(API+path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.message||'Request failed');return data}
 function money(n){return '₹'+Number(n||0).toLocaleString('en-IN')}
 function updateCart(){const bar=document.getElementById('cartBar');const count=cart.reduce((s,i)=>s+i.quantity,0);const total=cart.reduce((s,i)=>s+i.quantity*i.price,0);bar.style.display=count?'block':'none';document.getElementById('cartCount').textContent=count;document.getElementById('cartTotal').textContent=total}
@@ -1248,7 +1275,8 @@ document.getElementById('cartBar').addEventListener('click',openCheckout);docume
 async function loadProducts(){const data=await api('/api/products?shop_id='+SHOP_ID);products.splice(0,products.length,...data);renderProducts();applyMode();}
 renderProducts=function(){prodGrid.innerHTML='';products.forEach((p,idx)=>{const low=p.stock<=p.low_stock_limit;const card=document.createElement('div');card.className='prod-card';card.innerHTML=`<div class="prod-img">${p.emoji||'📦'}</div><div class="prod-body"><div class="prod-cat">${p.cat||''}</div><div class="prod-name">${p.name}</div><div class="prod-desc">${p.description||''}</div><div class="prod-foot"><div class="prod-price">₹${p.price}</div><div class="prod-stock ${low?'low':''}">${p.stock} ${t('label_left')}</div></div><div class="vendor-only" style="margin-top:10px"><button class="cart-btn" data-stock="${idx}" data-change="-1">−</button> <button class="cart-btn" data-stock="${idx}" data-change="1">+</button></div><div style="margin-top:10px" class="customer-only"><button class="cart-btn" style="width:100%" data-cart="${idx}">${t('btn_addcart')}</button></div></div>`;prodGrid.appendChild(card)});prodGrid.querySelectorAll('[data-stock]').forEach(b=>b.onclick=async()=>{try{const p=products[+b.dataset.stock];await api('/api/products/'+p.id+'/stock',{method:'PATCH',body:JSON.stringify({change:+b.dataset.change})});await loadProducts();toast('Stock updated')}catch(e){toast(e.message)}});prodGrid.querySelectorAll('[data-cart]').forEach(b=>b.onclick=()=>{const p=products[+b.dataset.cart];const found=cart.find(i=>i.product_id===p.id);if(found)found.quantity++;else cart.push({product_id:p.id,name:p.name,price:p.price,quantity:1});updateCart();toast(p.name+' added to cart')})};
 async function loadShop(){const s=await api('/api/shop/'+SHOP_ID);const box=document.querySelector('#shop-setup .form-mock');const inputs=box.querySelectorAll('input');if(inputs[0])inputs[0].value=s.shop_name;if(inputs[1])inputs[1].value=s.location;if(inputs[2])inputs[2].value=s.contact;if(inputs[3])inputs[3].value=s.opening_time;if(inputs[4])inputs[4].value=s.closing_time;const preview=document.querySelector('#shop-setup .store-card');if(preview){preview.querySelector('.name').textContent=s.shop_name;preview.querySelector('.loc').textContent='📍 '+s.location;const tags=preview.querySelectorAll('.tag');if(tags[0])tags[0].textContent='🕒 '+s.opening_time+' – '+s.closing_time;if(tags[1])tags[1].textContent='📞 '+s.contact;if(tags[2])tags[2].textContent='🛒 '+s.category}window.__shop=s; const qrCaptionEl=document.getElementById('qrCaption'); if(qrCaptionEl) qrCaptionEl.textContent='Scan to open: /shop/'+s.id }
-const publishBtn=document.querySelector('#shop-setup .form-mock .btn.dark');if(publishBtn)publishBtn.addEventListener('click',async()=>{const box=document.querySelector('#shop-setup .form-mock'),i=box.querySelectorAll('input'),sel=box.querySelector('select');try{const s=await api('/api/shops',{method:'POST',body:JSON.stringify({shop_name:i[0].value,location:i[1].value,contact:i[2].value,opening_time:i[3].value,closing_time:i[4].value,category:sel.value})});window.__shop=s;toast('Shop published! QR: '+s.qr_token); setTimeout(()=>{ location.href='/shop/'+s.id; }, 500)}catch(e){toast(e.message)}});
+const publishBtn=document.querySelector('#shop-setup .form-mock .btn.dark');if(publishBtn)publishBtn.addEventListener('click',async()=>{const box=document.querySelector('#shop-setup .form-mock'),i=box.querySelectorAll('input'),sel=box.querySelector('select');try{const s=await api('/api/shops',{method:'POST',body:JSON.stringify({shop_name:i[0].value,location:i[1].value,contact:i[2].value,opening_time:i[3].value,closing_time:i[4].value,category:sel.value})});window.__shop=s;toast('Shop published! QR: '+s.qr_token); setTimeout(()=>generateShopQR(s.id));
+document.getElementById('qr').scrollIntoView({ behavior: 'smooth' });}catch(e){toast(e.message)}});
 async function loadOrders(){const data=await api('/api/orders?shop_id='+SHOP_ID);orders.splice(0,orders.length,...data.map(o=>({id:'#'+o.id,items:o.items.map(i=>{const p=products.find(x=>x.id===i.product_id);return (p?p.name:'Product')+(i.quantity>1?' x'+i.quantity:'')}).join(', '),stage:['new','accepted','preparing','ready','delivered'].indexOf(o.order_status),backendId:o.id})));renderOrders()}
 renderOrders=function(){board.innerHTML='';stageKeys.forEach((stageKey,si)=>{const col=document.createElement('div');col.className='order-col';const inStage=orders.filter(o=>o.stage===si);col.innerHTML=`<h4>${t(stageKey)} <span>${inStage.length}</span></h4>`;inStage.forEach(o=>{const c=document.createElement('div');c.className='order-card'+(si===4?' done':'');c.innerHTML=`<div class="oid">${o.id}</div><div class="oitems">${o.items}</div>${si<4?`<button class="oadv" data-id="${o.backendId}" data-next="${['new','accepted','preparing','ready','delivered'][si+1]}">${t('btn_moveforward')}</button>`:''}`;col.appendChild(c)});board.appendChild(col)});board.querySelectorAll('.oadv').forEach(b=>b.onclick=async()=>{try{await api('/api/orders/'+b.dataset.id+'/status',{method:'PATCH',body:JSON.stringify({status:b.dataset.next})});await loadOrders();await loadDashboard();toast('Order moved forward')}catch(e){toast(e.message)}})};
 async function loadDashboard(){const d=await api('/api/dashboard/'+SHOP_ID);const vals=document.querySelectorAll('#dashboard .stat-value');if(vals[0])vals[0].textContent=money(d.todaySales);if(vals[1])vals[1].textContent=d.totalOrders;if(vals[2])vals[2].textContent=d.pendingOrders;if(vals[3])vals[3].textContent=money(d.monthlySales);const list=document.querySelector('#dashboard .best-list');if(list)list.innerHTML=d.bestSellers.map((x,i)=>`<li><span><b>${String(i+1).padStart(2,'0')}</b>${x.product?.name||'Product'}</span><span style="font-family:var(--font-mono)">${x.units} sold</span></li>`).join('');barsWrap.innerHTML='';const max=Math.max(...d.weekly,1);d.weekly.forEach(v=>{const bar=document.createElement('div');bar.className='bar';bar.style.height=(v/max*100)+'%';bar.innerHTML=`<span>${Math.round(v/10)}</span>`;barsWrap.appendChild(bar)})}
@@ -1258,5 +1286,26 @@ const oldPay=document.getElementById('payBtn');oldPay.onclick=null;oldPay.addEve
 document.getElementById('downloadReportBtn').onclick=()=>{const date=new Date().toISOString().slice(0,10);window.location.href='/api/reports/'+SHOP_ID+'/csv?date='+date};
 const oldQr=qrBox;oldQr.onclick=()=>{oldQr.classList.add('scanning');qrCaption.textContent=t('qr_scanning');setTimeout(()=>{oldQr.classList.remove('scanning');const id=window.__shop?.id||SHOP_ID;location.href='/shop/'+id;},900)};
 (async()=>{try{await loadShop();await loadProducts();await loadOrders();await loadDashboard();await loadReport(new Date().toISOString().slice(0,10))}catch(e){console.error(e);toast(e.message)}})();
-</script></body>
+function generateShopQR(shopId) {
+    const qrBox = document.getElementById('qrBox');
+    const qrCaption = document.getElementById('qrCaption');
+
+    if (!qrBox || !shopId) return;
+
+    qrBox.innerHTML = '';
+
+    const shopUrl = `https://smart-vyapar-rn0v.onrender.com/shop/${shopId}`;
+    new QRCode(qrBox, {
+        text: shopUrl,
+        width: 220,
+        height: 220,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    if (qrCaption) {
+        qrCaption.textContent = `Scan to open shop/${shopId}`;
+    }
+}</script></body>
 </html>
