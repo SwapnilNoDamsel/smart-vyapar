@@ -25,8 +25,11 @@ async function initDatabase() {
     host: DB_CONFIG.host,
     port: DB_CONFIG.port,
     user: DB_CONFIG.user,
-    password: DB_CONFIG.password
-  });
+    password: DB_CONFIG.password,
+    ssl: {
+        rejectUnauthorized: false             
+    }
+});
   await bootstrap.query(`CREATE DATABASE IF NOT EXISTS \`${DB_CONFIG.database}\``);
   await bootstrap.end();
 
@@ -35,8 +38,11 @@ async function initDatabase() {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    multipleStatements: true
-  });
+    multipleStatements: true,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 
   await db.query(`
     CREATE TABLE IF NOT EXISTS vendors (
@@ -140,28 +146,6 @@ async function initDatabase() {
     await db.query(`ALTER TABLE products ADD COLUMN emoji VARCHAR(20) DEFAULT '📦' AFTER category`);
   }
 
-  const [vendors] = await db.query('SELECT id FROM vendors ORDER BY id LIMIT 1');
-  let vendorId = vendors[0]?.id;
-  if (!vendorId) {
-    const [r] = await db.query('INSERT INTO vendors (name, phone, email) VALUES (?, ?, ?)', ['Smart Vyapar Demo Vendor', '9999999999', 'demo@smartvyapar.local']);
-    vendorId = r.insertId;
-  }
-
-  const [shops] = await db.query('SELECT id FROM shops ORDER BY id LIMIT 1');
-  if (!shops[0]) {
-    const token = 'SHOP-' + crypto.randomBytes(5).toString('hex').toUpperCase();
-    const [r] = await db.query(`INSERT INTO shops (vendor_id, shop_name, location, contact, opening_time, closing_time, category, upi_id, qr_token, is_published) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)`, [vendorId, 'Sharma Kirana Store', 'Virar, Maharashtra', '9999999999', '08:00', '22:00', 'Grocery & Kirana', 'sharma.kirana@upi', token]);
-    const shopId = r.insertId;
-    const products = [
-      ['Basmati Rice', 'Premium long-grain rice.', 120, 18, 'Grains', '🍚'],
-      ['Mustard Oil', 'Cold-pressed mustard oil.', 180, 12, 'Oils', '🫗'],
-      ['Biscuits', 'Assorted tea-time biscuits.', 30, 24, 'Snacks', '🍪'],
-      ['Salt', 'Iodised cooking salt.', 25, 30, 'Essentials', '🧂'],
-      ['Milk', 'Fresh daily milk.', 32, 10, 'Dairy', '🥛'],
-      ['Bread', 'Soft fresh bread loaf.', 40, 8, 'Bakery', '🍞']
-    ];
-    for (const p of products) await db.query('INSERT INTO products (shop_id,name,description,price,stock,category,emoji,low_stock_limit) VALUES (?,?,?,?,?,?,?,5)', [shopId, ...p]);
-  }
 }
 
 function shopBase(req) {
