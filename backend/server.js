@@ -329,7 +329,7 @@ app.get('/api/reports/:shopId/csv', async (req,res)=>{
   res.setHeader('Content-Type','text/csv'); res.setHeader('Content-Disposition',`attachment; filename="daily-report-${date}.csv"`); res.send(csv);
 });
 
-const frontend = path.join(__dirname,'..','frontend');
+const frontend = path.join(__dirname,'public');
 app.use(express.static(frontend));
 app.get('/shop/:id', (req,res)=>res.sendFile(path.join(frontend,'index.html')));
 app.get('*',(req,res)=>res.sendFile(path.join(frontend,'index.html')));

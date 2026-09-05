@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Vyapar — Every Local Shop, One Scan Away</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root{
+  --paper:#F3ECD9;
+  --paper-dim:#EAE1C8;
+  --ink:#22281F;
+  --ink-soft:#4B5142;
+  --indigo:#9A2A1D;
+  --indigo-dim:#C0402B;
+  --mustard:#E3A72E;
+  --mustard-deep:#C6871A;
+  --vermillion:#D9481F;
+  --teal:#1E6E63;
+  --line:#D8CCA8;
+  --card:#FBF8EE;
+  --radius:14px;
+  --shadow: 0 6px 18px rgba(34,40,31,0.10);
+  --font-display:'Baloo 2', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  line-height:1.5;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px);
+  background-size: 100% 42px;
+  background-attachment:local;
+}
+
+::selection{ background:var(--mustard); color:var(--ink); }
+
+a{ color:inherit; text-decoration:none; }
+img{max-width:100%; display:block;}
+
+.wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+/* ---------- NAV ---------- */
+header.nav{
+  position:sticky; top:0; z-index:50;
+  background:rgba(243,236,217,0.92);
+  backdrop-filter: blur(6px);
+  border-bottom:2px solid var(--ink);
+}
+.nav-inner{
+  max-width:1180px; margin:0 auto; padding:14px 28px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px;
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-mark{
+  width:38px; height:38px; border-radius:8px;
+  background:var(--indigo); color:var(--mustard);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:800; font-size:19px;
+  border:2px solid var(--ink);
+  transform:rotate(-4deg);
+}
+.brand-name{ font-family:var(--font-display); font-weight:700; font-size:20px; letter-spacing:0.2px; }
+.brand-name small{ display:block; font-family:var(--font-mono); font-weight:400; font-size:10px; color:var(--ink-soft); letter-spacing:1.5px; text-transform:uppercase; }
+
+nav.links{ display:flex; gap:22px; font-size:14px; font-weight:600; }
+nav.links a{ position:relative; padding:4px 0; color:var(--ink-soft); transition:color .15s; }
+nav.links a:hover{ color:var(--indigo); }
+nav.links a::after{
+  content:""; position:absolute; left:0; bottom:-3px; height:2px; width:0%;
+  background:var(--vermillion); transition:width .2s;
+}
+nav.links a:hover::after{ width:100%; }
+
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--font-body); font-weight:700; font-size:14px;
+  padding:10px 18px; border-radius:999px; border:2px solid var(--ink);
+  cursor:pointer; transition: transform .12s ease, box-shadow .12s ease;
+  background:var(--mustard); color:var(--ink);
+}
+.btn:hover{ transform:translateY(-2px); box-shadow:3px 4px 0 var(--ink); }
+.btn:active{ transform:translateY(0); box-shadow:none; }
+.btn.ghost{ background:transparent; }
+.btn.dark{ background:var(--indigo); color:var(--paper); border-color:var(--indigo);}
+.btn.dark:hover{ box-shadow:3px 4px 0 var(--ink); }
+
+@media (max-width:820px){ nav.links{ display:none; } }
+
+.lang-switch{ display:flex; border:2px solid var(--ink); border-radius:999px; overflow:hidden; }
+.lang-btn{
+  font-family:var(--font-mono); font-weight:700; font-size:12px; padding:7px 12px; border:none;
+  background:var(--card); cursor:pointer; color:var(--ink-soft);
+}
+.lang-btn + .lang-btn{ border-left:2px solid var(--ink); }
+.lang-btn.active{ background:var(--indigo); color:var(--paper); }
+
+/* ---------- HERO ---------- */
+.hero{ padding:56px 0 36px; position:relative; overflow:hidden; }
+.hero-grid{ display:grid; grid-template-columns: 1.1fr 0.9fr; gap:48px; align-items:center; }
+@media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--font-mono); font-size:12px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--teal); font-weight:700; margin-bottom:18px;
+}
+.eyebrow::before{ content:"●"; color:var(--vermillion); }
+
+h1.headline{
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(34px, 5.2vw, 58px); line-height:1.04; letter-spacing:-0.5px;
+  color:var(--ink);
+}
+h1.headline .accent{ color:var(--vermillion); }
+h1.headline .under{
+  background:linear-gradient(180deg, transparent 62%, var(--mustard) 62%);
+}
+
+.sub{ margin-top:20px; font-size:17px; color:var(--ink-soft); max-width:46ch; }
+.hero-ctas{ margin-top:30px; display:flex; gap:14px; flex-wrap:wrap; }
+
+.trust-row{ margin-top:40px; display:flex; gap:28px; flex-wrap:wrap; }
+.trust-item{ }
+.trust-item .num{ font-family:var(--font-display); font-weight:800; font-size:26px; color:var(--indigo); }
+.trust-item .lbl{ font-family:var(--font-mono); font-size:11px; letter-spacing:0.8px; text-transform:uppercase; color:var(--ink-soft); }
+
+/* phone mockup */
+.phone{
+  width:270px; margin-left:auto; margin-right:auto;
+  background:var(--ink); border-radius:34px; padding:12px;
+  box-shadow: 0 20px 40px rgba(34,40,31,0.28);
+  transform:rotate(2deg);
+}
+.phone-screen{
+  background:var(--card); border-radius:22px; overflow:hidden; min-height:480px;
+  display:flex; flex-direction:column;
+}
+.phone-status{ display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10px; padding:8px 14px; color:var(--ink-soft); }
+.phone-shop-header{
+  background:var(--indigo); color:var(--paper); padding:16px 14px 20px;
+  border-bottom-left-radius:18px; border-bottom-right-radius:18px;
+}
+.phone-shop-header .name{ font-family:var(--font-display); font-weight:700; font-size:18px; }
+.phone-shop-header .meta{ font-size:11px; opacity:.85; margin-top:4px; font-family:var(--font-mono); }
+.phone-body{ padding:12px 12px 16px; flex:1; }
+.mini-prod{
+  display:flex; gap:10px; align-items:center; padding:8px; border:1.5px solid var(--line); border-radius:10px; margin-bottom:8px; background:#fff;
+}
+.mini-thumb{ width:38px; height:38px; border-radius:8px; background:var(--mustard); flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-size:16px;}
+.mini-info{ flex:1; }
+.mini-info .n{ font-weight:700; font-size:12.5px; }
+.mini-info .p{ font-family:var(--font-mono); font-size:11px; color:var(--teal); font-weight:700; }
+.mini-add{ font-family:var(--font-mono); font-size:11px; font-weight:700; border:1.5px solid var(--ink); border-radius:6px; padding:4px 8px; }
+
+/* ---------- SECTION SCAFFOLD ---------- */
+section{ padding:48px 0; border-top:2px dashed var(--line); }
+.section-head{ max-width:640px; margin-bottom:26px; }
+h2.section-title{ font-family:var(--font-display); font-weight:800; font-size:clamp(26px,3.4vw,38px); color:var(--ink); }
+.section-desc{ color:var(--ink-soft); margin-top:12px; font-size:15.5px; max-width:56ch; }
+
+.reveal{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.in-view{ opacity:1; transform:translateY(0); }
+
+.panel{
+  background:var(--card); border:2px solid var(--ink); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px;
+}
+
+/* ============ FEATURE 1: create shop form mockup ============ */
+.feat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
+@media (max-width:880px){ .feat-grid{ grid-template-columns:1fr; } }
+
+.form-mock label{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-soft); font-weight:700; display:block; margin-bottom:6px; }
+.form-mock .field{ margin-bottom:16px; }
+.form-mock input, .form-mock select, .form-mock textarea{
+  width:100%; padding:11px 12px; border:1.6px solid var(--ink); border-radius:8px; background:#fff;
+  font-family:var(--font-body); font-size:14px; color:var(--ink);
+}
+.form-mock .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.logo-drop{
+  border:2px dashed var(--ink-soft); border-radius:10px; padding:18px; text-align:center; font-size:13px; color:var(--ink-soft); font-family:var(--font-mono); cursor:pointer;
+}
+
+/* storefront preview card */
+.store-preview{ position:sticky; top:100px; }
+.store-card{ background:var(--card); border:2px solid var(--ink); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+.store-banner{ background:repeating-linear-gradient(135deg, var(--indigo), var(--indigo) 10px, var(--indigo-dim) 10px, var(--indigo-dim) 20px); height:70px; }
+.store-id{ padding:16px 18px; display:flex; gap:12px; align-items:center; margin-top:-30px; }
+.store-logo{ width:56px; height:56px; border-radius:12px; background:var(--mustard); border:3px solid var(--card); display:flex; align-items:center; justify-content:center; font-size:24px; }
+.store-id .name{ font-family:var(--font-display); font-weight:700; font-size:18px; }
+.store-id .loc{ font-size:12px; color:var(--ink-soft); }
+.store-meta-row{ padding:0 18px 18px; display:flex; gap:10px; flex-wrap:wrap; }
+.tag{ font-family:var(--font-mono); font-size:11px; padding:5px 10px; background:var(--paper-dim); border-radius:999px; border:1px solid var(--line); }
+
+/* ============ FEATURE 2: product store ============ */
+.view-toggle{ display:inline-flex; border:2px solid var(--ink); border-radius:999px; overflow:hidden; margin-bottom:24px; }
+.view-toggle button{
+  font-family:var(--font-mono); font-weight:700; font-size:12.5px; padding:9px 18px; border:none; background:var(--card); cursor:pointer; color:var(--ink-soft);
+}
+.view-toggle button.active{ background:var(--indigo); color:var(--paper); }
+
+.prod-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(190px,1fr)); gap:16px; }
+.prod-card{ background:var(--card); border:2px solid var(--ink); border-radius:12px; overflow:hidden; transition:transform .15s; }
+.prod-card:hover{ transform:translateY(-4px); }
+.prod-img{ height:110px; background:var(--mustard); display:flex; align-items:center; justify-content:center; font-size:34px; border-bottom:2px solid var(--ink); }
+.prod-body{ padding:12px 13px 14px; }
+.prod-cat{ font-family:var(--font-mono); font-size:9.5px; text-transform:uppercase; letter-spacing:1px; color:var(--teal); font-weight:700; }
+.prod-name{ font-weight:700; font-size:14.5px; margin-top:3px; }
+.prod-desc{ font-size:12px; color:var(--ink-soft); margin-top:4px; min-height:28px; }
+.prod-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+.prod-price{ font-family:var(--font-mono); font-weight:700; color:var(--ink); }
+.prod-stock{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-soft); }
+.prod-stock.low{ color:var(--vermillion); font-weight:700; }
+.cart-btn{ font-size:11px; font-weight:700; border:1.5px solid var(--ink); background:var(--paper); border-radius:6px; padding:5px 9px; cursor:pointer; }
+.cart-btn:hover{ background:var(--mustard); }
+
+.vendor-only{ display:none; }
+.vendor-mode .vendor-only{ display:flex; }
+.vendor-mode .prod-card .stock-editor{ display:flex; }
+
+.stock-editor{ display:none; align-items:center; gap:6px; margin-top:8px; font-family:var(--font-mono); font-size:11px; }
+.stock-editor button{ width:22px; height:22px; border:1.5px solid var(--ink); background:#fff; border-radius:5px; cursor:pointer; font-weight:700; }
+
+/* ============ FEATURE 3: order management ============ */
+.order-board{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; overflow-x:auto; }
+@media (max-width:920px){ .order-board{ grid-template-columns:repeat(5, 200px); } }
+.order-col{ background:var(--paper-dim); border:1.6px solid var(--line); border-radius:10px; padding:10px; min-height:220px;}
+.order-col h4{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:10px; color:var(--ink-soft); display:flex; justify-content:space-between; }
+.order-card{ background:var(--card); border:1.6px solid var(--ink); border-radius:8px; padding:10px; font-size:12.5px; margin-bottom:8px; cursor:grab; box-shadow:2px 2px 0 rgba(34,40,31,0.08); }
+.order-card .oid{ font-family:var(--font-mono); font-weight:700; font-size:11px; color:var(--indigo); }
+.order-card .oitems{ margin-top:4px; color:var(--ink-soft); }
+.order-card .oadv{ margin-top:8px; width:100%; font-family:var(--font-mono); font-size:10px; font-weight:700; padding:5px; border:1.5px solid var(--ink); border-radius:5px; background:var(--mustard); cursor:pointer; }
+.order-card .oadv:hover{ background:var(--mustard-deep); }
+.order-card.done .oadv{ display:none; }
+
+.stepper-hint{ display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); margin-bottom:20px; flex-wrap:wrap; }
+.stepper-hint b{ color:var(--ink); background:var(--paper-dim); padding:3px 8px; border-radius:6px; }
+
+/* ============ FEATURE 4: QR ============ */
+.qr-grid{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:48px; align-items:center; }
+@media (max-width:880px){ .qr-grid{ grid-template-columns:1fr; } }
+.qr-stage{ display:flex; flex-direction:column; align-items:center; gap:16px; }
+.qr-box{
+  width:220px; height:220px; background:#fff; border:3px solid var(--ink); border-radius:16px;
+  padding:14px; cursor:pointer; position:relative; box-shadow:var(--shadow);
+}
+.qr-box svg{ width:100%; height:100%; }
+.qr-caption{ font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); text-align:center; }
+.qr-scan-line{
+  position:absolute; left:8px; right:8px; height:3px; background:var(--vermillion); top:14px;
+  box-shadow:0 0 10px var(--vermillion); display:none;
+}
+.qr-box.scanning .qr-scan-line{ display:block; animation:scan 1.1s linear; }
+@keyframes scan{ 0%{ top:14px; } 100%{ top:calc(100% - 22px); } }
+.qr-placements{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
+.qr-placements span{ font-family:var(--font-mono); font-size:11px; background:var(--paper-dim); border:1px solid var(--line); border-radius:999px; padding:5px 10px; }
+
+/* ============ FEATURE 5: payment ============ */
+.pay-mock{ max-width:380px; }
+.pay-opt{ display:flex; align-items:center; gap:12px; padding:14px; border:1.6px solid var(--ink); border-radius:10px; margin-bottom:10px; cursor:pointer; background:var(--card); transition:background .15s; }
+.pay-opt:hover{ background:var(--paper-dim); }
+.pay-opt.selected{ background:var(--mustard); }
+.pay-radio{ width:16px; height:16px; border-radius:50%; border:2px solid var(--ink); flex:0 0 auto; position:relative; }
+.pay-opt.selected .pay-radio::after{ content:""; position:absolute; inset:2px; background:var(--ink); border-radius:50%; }
+.pay-icon{ font-size:20px; }
+.pay-name{ font-weight:700; font-size:14px; }
+.pay-sub{ font-size:11.5px; color:var(--ink-soft); font-family:var(--font-mono); }
+.pay-cta{ width:100%; margin-top:6px; }
+.pay-status{ margin-top:14px; text-align:center; font-family:var(--font-mono); font-size:12.5px; padding:10px; border-radius:8px; background:var(--paper-dim); display:none; }
+.pay-status.show{ display:block; }
+
+/* ============ FEATURE 6: dashboard ============ */
+.stat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:30px; }
+.stat-card{ background:var(--card); border:2px solid var(--ink); border-radius:12px; padding:16px; }
+.stat-label{ font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.8px; color:var(--ink-soft); }
+.stat-value{ font-family:var(--font-display); font-weight:700; font-size:26px; margin-top:6px; }
+.stat-value.teal{ color:var(--teal); }
+.stat-value.vermillion{ color:var(--vermillion); }
+
+.chart-panel{ display:grid; grid-template-columns:1.4fr 1fr; gap:30px; }
+@media (max-width:820px){ .chart-panel{ grid-template-columns:1fr; } }
+.bars{ display:flex; align-items:flex-end; gap:12px; height:180px; padding-top:10px; border-bottom:2px solid var(--ink); }
+.bar{ flex:1; background:linear-gradient(180deg, var(--mustard), var(--mustard-deep)); border:2px solid var(--ink); border-bottom:none; border-radius:6px 6px 0 0; position:relative; min-height:6px; }
+.bar span{ position:absolute; top:-20px; left:0; right:0; text-align:center; font-family:var(--font-mono); font-size:10px; font-weight:700; }
+.bar-labels{ display:flex; gap:12px; margin-top:8px; }
+.bar-labels div{ flex:1; text-align:center; font-family:var(--font-mono); font-size:10px; color:var(--ink-soft); }
+
+.best-list{ list-style:none; }
+.best-list li{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed var(--line); font-size:13.5px; }
+.best-list li b{ font-family:var(--font-mono); font-size:11px; background:var(--indigo); color:var(--paper); border-radius:5px; padding:2px 7px; margin-right:8px; }
+
+/* ============ FEATURE 7: low stock ============ */
+.alert-demo{ max-width:520px; }
+.alert-banner{
+  display:flex; align-items:center; gap:12px; background:#FBE7DD; border:2px solid var(--vermillion); color:#7A2A18;
+  padding:14px 16px; border-radius:10px; font-weight:600; font-size:13.5px; margin-top:16px;
+  opacity:0; transform:translateX(-8px); transition:opacity .35s, transform .35s;
+}
+.alert-banner.show{ opacity:1; transform:translateX(0); }
+.alert-icon{ font-size:20px; }
+.stock-sim{ display:flex; align-items:center; gap:14px; }
+.stock-sim .count{ font-family:var(--font-mono); font-weight:700; font-size:34px; min-width:56px; }
+.stock-sim .count.low{ color:var(--vermillion); }
+
+/* ============ FEATURE 8: daily reports ============ */
+.report-toolbar{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:22px; }
+.day-tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+.day-tab{
+  font-family:var(--font-mono); font-weight:700; font-size:12px; padding:8px 14px; border-radius:999px;
+  border:1.6px solid var(--ink); background:var(--card); cursor:pointer; color:var(--ink-soft);
+}
+.day-tab .d{ display:block; font-size:9.5px; opacity:.75; margin-top:1px; }
+.day-tab.active{ background:var(--indigo); color:var(--paper); }
+.report-stat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:26px; }
+.report-table{ width:100%; border-collapse:collapse; }
+.report-table thead th{
+  text-align:left; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.7px;
+  color:var(--ink-soft); padding:0 10px 10px; border-bottom:2px solid var(--ink);
+}
+.report-table tbody td{ padding:12px 10px; border-bottom:1px dashed var(--line); font-size:13.5px; }
+.report-table tbody tr:last-child td{ border-bottom:none; }
+.report-prod{ display:flex; align-items:center; gap:10px; }
+.report-prod .em{ font-size:18px; width:30px; height:30px; border-radius:8px; background:var(--mustard); display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+.report-prod .nm{ font-weight:700; }
+.report-units{ font-family:var(--font-mono); font-weight:700; }
+.report-revenue{ font-family:var(--font-mono); color:var(--teal); font-weight:700; }
+.report-trend{ font-family:var(--font-mono); font-size:12px; font-weight:700; }
+.report-trend.up{ color:var(--teal); }
+.report-trend.down{ color:var(--vermillion); }
+.report-trend.flat{ color:var(--ink-soft); }
+.report-top-badge{
+  font-family:var(--font-mono); font-size:9.5px; font-weight:700; background:var(--mustard); border:1px solid var(--ink);
+  border-radius:6px; padding:2px 6px; margin-left:8px;
+}
+.report-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:20px; flex-wrap:wrap; gap:10px; }
+.report-note{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft); }
+
+/* ============ CUSTOMER FLOW (no forced signup) ============ */
+.mini-steps{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.mini-step{ background:var(--card); border:1.6px solid var(--ink); border-radius:10px; padding:12px 16px; font-family:var(--font-mono); font-size:12.5px; font-weight:700; }
+.mini-step-arrow{ color:var(--vermillion); font-weight:800; }
+.callout{
+  margin-top:26px; background:#FFF7E0; border:2px solid var(--mustard-deep); border-radius:12px; padding:16px 18px; font-size:13.5px;
+  display:flex; gap:12px;
+}
+
+/* ---------- FOOTER ---------- */
+footer{ background:var(--indigo); color:var(--paper); padding:52px 0 30px; margin-top:40px; }
+.foot-grid{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px; }
+.foot-brand{ font-family:var(--font-display); font-weight:700; font-size:20px; }
+.foot-line{ font-family:var(--font-mono); font-size:11.5px; color:#B9C4D6; margin-top:8px; max-width:40ch;}
+.foot-list{ list-style:none; font-size:13px; display:flex; flex-direction:column; gap:8px; color:#D8E0EC; }
+.foot-bottom{ margin-top:36px; padding-top:18px; border-top:1px solid rgba(255,255,255,0.15); font-family:var(--font-mono); font-size:11px; color:#93A2B8; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <div class="brand-mark">अ</div>
+      <div class="brand-name">Smart Vyapar<small data-i18n="nav_tagline">Vendor → QR → Customer</small></div>
+    </div>
+    <nav class="links">
+      <a href="#shop-setup" data-i18n="nav_shop">Shop</a>
+      <a href="#products" data-i18n="nav_products">Products</a>
+      <a href="#orders" data-i18n="nav_orders">Orders</a>
+      <a href="#qr" data-i18n="nav_qr">QR</a>
+      <a href="#payment" data-i18n="nav_payment">Payment</a>
+      <a href="#dashboard" data-i18n="nav_dashboard">Dashboard</a>
+      <a href="#stock" data-i18n="nav_alerts">Alerts</a>
+      <a href="#reports" data-i18n="nav_reports">Reports</a>
+    </nav>
+    <div class="lang-switch" id="langSwitch">
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="hi">हिं</button>
+      <button class="lang-btn" data-lang="mr">मर</button>
+    </div>
+    <a href="#shop-setup" class="btn" data-i18n="nav_cta">Start free</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow" data-i18n="hero_eyebrow">Built for the corner shop, not the megastore</span>
+      <h1 class="headline" id="heroHeadline" data-i18n-html="hero_headline">Every small vendor <span class="under">deserves</span> a shop the whole street can <span class="accent">scan into.</span></h1>
+      <p class="sub" data-i18n="hero_sub">One QR code turns any counter, cart, or shutter into a full online store — products, orders, UPI payments, and stock, all in a dashboard the vendor already knows how to run: like a ledger, just faster.</p>
+      <div class="hero-ctas">
+        <a href="#shop-setup" class="btn dark" data-i18n="hero_cta1">Set up my shop</a>
+        <a href="#products" class="btn ghost" style="border-color:var(--ink);" data-i18n="hero_cta2">Explore features ↓</a>
+      </div>
+
+      <div class="trust-row">
+        <div class="trust-item"><div class="num">0%</div><div class="lbl" data-i18n="trust1">Coding required</div></div>
+        <div class="trust-item"><div class="num">1</div><div class="lbl" data-i18n="trust2">QR code per shop</div></div>
+        <div class="trust-item"><div class="num">UPI</div><div class="lbl" data-i18n="trust3">Payments built in</div></div>
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="phone-status"><span>9:41</span><span>●●● UPI</span></div>
+        <div class="phone-shop-header">
+          <div class="name">🥭 Sharma Kirana Store</div>
+          <div class="meta">Model Town, Pune · Open 7am–10pm</div>
+        </div>
+        <div class="phone-body">
+          <div class="mini-prod">
+            <div class="mini-thumb">🍚</div>
+            <div class="mini-info"><div class="n">Basmati Rice 5kg</div><div class="p">₹520</div></div>
+            <div class="mini-add">Add</div>
+          </div>
+          <div class="mini-prod">
+            <div class="mini-thumb">🧴</div>
+            <div class="mini-info"><div class="n">Mustard Oil 1L</div><div class="p">₹165</div></div>
+            <div class="mini-add">Add</div>
+          </div>
+          <div class="mini-prod">
+            <div class="mini-thumb">🍪</div>
+            <div class="mini-info"><div class="n">Glucose Biscuits</div><div class="p">₹30</div></div>
+            <div class="mini-add">Add</div>
+          </div>
+          <div class="mini-prod">
+            <div class="mini-thumb">🧂</div>
+            <div class="mini-info"><div class="n">Tata Salt 1kg</div><div class="p">₹28</div></div>
+            <div class="mini-add">Add</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURE 1 ================= -->
+<section id="shop-setup">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title" data-i18n="s1_title">Create your online shop</h2>
+      <p class="section-desc" data-i18n="s1_desc">The vendor fills a short form — shop name, logo, location, timings, contact — and the storefront builds itself. No coding, no designer, no waiting.</p>
+    </div>
+
+    <div class="feat-grid reveal">
+      <div class="panel form-mock">
+        <div class="field">
+          <label data-i18n="label_shopname">Shop name</label>
+          <input type="text" value="Sharma Kirana Store">
+        </div>
+        <div class="field">
+          <label data-i18n="label_logo">Logo</label>
+          <div class="logo-drop" data-i18n="label_logo_upload">🖼️ Tap to upload shop logo</div>
+        </div>
+        <div class="field row2">
+          <div><label data-i18n="label_location">Location</label><input type="text" value="Model Town, Pune"></div>
+          <div><label data-i18n="label_contact">Contact number</label><input type="text" value="+91 98xxxxxx21"></div>
+        </div>
+        <div class="field row2">
+          <div><label data-i18n="label_opens">Opens</label><input type="text" value="7:00 AM"></div>
+          <div><label data-i18n="label_closes">Closes</label><input type="text" value="10:00 PM"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="label_category">Category</label>
+          <select><option data-i18n="opt_grocery">Grocery & Kirana</option><option data-i18n="opt_bakery">Bakery</option><option data-i18n="opt_pharmacy">Pharmacy</option><option data-i18n="opt_stationery">Stationery</option></select>
+        </div>
+        <button class="btn dark" style="width:100%; justify-content:center;" data-i18n="btn_publish">Publish my shop →</button>
+      </div>
+
+      <div class="store-preview">
+        <div class="store-card">
+          <div class="store-banner"></div>
+          <div class="store-id">
+            <div class="store-logo">🥭</div>
+            <div>
+              <div class="name">Sharma Kirana Store</div>
+              <div class="loc">📍 Model Town, Pune</div>
+            </div>
+          </div>
+          <div class="store-meta-row">
+            <span class="tag">🕒 7 AM – 10 PM</span>
+            <span class="tag">📞 +91 98xxxxxx21</span>
+            <span class="tag">🛒 Grocery & Kirana</span>
+          </div>
+        </div>
+        <p style="font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft); margin-top:10px; text-align:center;" data-i18n="preview_caption">↑ live preview, updates as the vendor types</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURE 2 ================= -->
+<section id="products">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title" data-i18n="s2_title">Add products once, sell to everyone</h2>
+      <p class="section-desc" data-i18n="s2_desc">Each product carries an image, name, price, description, stock, and category. Customers browse the same catalogue the vendor manages — switch the view to see both sides.</p>
+    </div>
+
+    <div class="reveal">
+      <div class="view-toggle" id="viewToggle">
+        <button class="active" data-mode="customer" data-i18n="toggle_customer">👀 Customer view</button>
+        <button data-mode="vendor" data-i18n="toggle_vendor">🧑‍💼 Vendor view</button>
+      </div>
+
+      <div class="prod-grid" id="prodGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURE 3 ================= -->
+<section id="orders">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title" data-i18n="s3_title">From "New" to "Delivered" — nothing gets lost</h2>
+      <p class="section-desc" data-i18n="s3_desc">A customer places an order and it lands straight on the vendor's dashboard. Click "Move forward →" on any card to push it through the flow.</p>
+    </div>
+    <div class="stepper-hint reveal"><b data-i18n="stage_new">New</b> → <b data-i18n="stage_accepted">Accepted</b> → <b data-i18n="stage_preparing">Preparing</b> → <b data-i18n="stage_ready">Ready</b> → <b data-i18n="stage_delivered">Delivered</b></div>
+    <div class="order-board reveal" id="orderBoard"></div>
+  </div>
+</section>
+
+<!-- ================= FEATURE 4 ================= -->
+<section id="qr">
+  <div class="wrap qr-grid">
+    <div class="reveal">
+      <h2 class="section-title" data-i18n="s4_title">One code. Every vendor. Instant shop.</h2>
+      <p class="section-desc" data-i18n="s4_desc">Every vendor gets a unique QR code the moment their shop is published. A customer scans it, and the vendor's online shop opens directly — no app to install, no search required.</p>
+      <p style="margin-top:16px; font-size:14px; color:var(--ink-soft);" data-i18n="s4_sub">Especially useful for small local vendors — the code goes wherever the shop already lives:</p>
+      <div class="qr-placements">
+        <span data-i18n="qr_counter">🧾 the counter</span>
+        <span data-i18n="qr_packaging">📦 packaging</span>
+        <span data-i18n="qr_banner">🪧 a banner</span>
+        <span data-i18n="qr_shutter">🚪 the shutter</span>
+      </div>
+    </div>
+    <div class="qr-stage reveal">
+      <div class="qr-box" id="qrBox"></div>
+
+<div class="qr-caption" id="qrCaption">
+    Scan to open this shop
+</div>
+  </div>
+</section>
+
+<!-- ================= FEATURE 5 ================= -->
+<section id="payment">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title" data-i18n="s5_title">UPI-first checkout, no gateway required</h2>
+      <p class="section-desc" data-i18n="s5_desc">Vendors add their UPI ID or QR, and customers pick a digital payment option at checkout — quick, familiar, and cash-optional.</p>
+    </div>
+    <div class="panel pay-mock reveal">
+      <div class="pay-opt selected" data-pay="upi">
+        <div class="pay-radio"></div>
+        <div class="pay-icon">📲</div>
+        <div><div class="pay-name" data-i18n="pay_upi">Pay via UPI</div><div class="pay-sub">sharma.kirana@upi</div></div>
+      </div>
+      <div class="pay-opt" data-pay="qr">
+        <div class="pay-radio"></div>
+        <div class="pay-icon">🔲</div>
+        <div><div class="pay-name" data-i18n="pay_qr">Scan vendor's QR</div><div class="pay-sub" data-i18n="pay_qr_sub">GPay · PhonePe · Paytm</div></div>
+      </div>
+      <div class="pay-opt" data-pay="cod">
+        <div class="pay-radio"></div>
+        <div class="pay-icon">💵</div>
+        <div><div class="pay-name" data-i18n="pay_cod">Cash on delivery</div><div class="pay-sub" data-i18n="pay_cod_sub">Pay when it arrives</div></div>
+      </div>
+      <button class="btn dark pay-cta" id="payBtn" data-i18n="btn_confirm">Confirm payment · ₹743</button>
+      <div class="pay-status" id="payStatus"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURE 6 ================= -->
+<section id="dashboard">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title" data-i18n="s6_title">Everything a vendor needs to check in ten seconds</h2>
+      <p class="section-desc" data-i18n="s6_desc">Today's sales, total and pending orders, best-sellers, and the monthly trend — one screen, one glance.</p>
+    </div>
+
+    <div class="reveal">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label" data-i18n="stat_today">Today's sales</div><div class="stat-value teal">₹4,280</div></div>
+        <div class="stat-card"><div class="stat-label" data-i18n="stat_total">Total orders</div><div class="stat-value">312</div></div>
+        <div class="stat-card"><div class="stat-label" data-i18n="stat_pending">Pending orders</div><div class="stat-value vermillion">6</div></div>
+        <div class="stat-card"><div class="stat-label" data-i18n="stat_monthly">Monthly sales</div><div class="stat-value">₹1.12L</div></div>
+      </div>
+
+      <div class="chart-panel panel">
+        <div>
+          <div class="stat-label" style="margin-bottom:6px;" data-i18n="chart_week">Sales this week (₹ '00s)</div>
+          <div class="bars" id="bars"></div>
+          <div class="bar-labels"><div data-i18n="day_mon">Mon</div><div data-i18n="day_tue">Tue</div><div data-i18n="day_wed">Wed</div><div data-i18n="day_thu">Thu</div><div data-i18n="day_fri">Fri</div><div data-i18n="day_sat">Sat</div><div data-i18n="day_sun">Sun</div></div>
+        </div>
+        <div>
+          <div class="stat-label" style="margin-bottom:6px;" data-i18n="best_sellers">Best-selling products</div>
+          <ul class="best-list">
+            <li><span><b>01</b>Basmati Rice 5kg</span><span style="font-family:var(--font-mono);">86 sold</span></li>
+            <li><span><b>02</b>Mustard Oil 1L</span><span style="font-family:var(--font-mono);">71 sold</span></li>
+            <li><span><b>03</b>Tata Salt 1kg</span><span style="font-family:var(--font-mono);">64 sold</span></li>
+            <li><span><b>04</b>Glucose Biscuits</span><span style="font-family:var(--font-mono);">52 sold</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURE 7 ================= -->
+<section id="stock">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title" data-i18n="s7_title">A nudge before the shelf goes empty</h2>
+      <p class="section-desc" data-i18n="s7_desc">When stock reaches a defined minimum, the dashboard raises a flag automatically — so restocking happens before a customer ever hits "out of stock."</p>
+    </div>
+
+    <div class="panel alert-demo reveal">
+      <div class="stock-sim">
+        <div class="stat-label" data-i18n="stock_label">Mustard Oil 1L — units left</div>
+      </div>
+      <div class="stock-sim" style="margin-top:6px;">
+        <div class="count" id="stockCount">12</div>
+        <button class="btn" id="sellBtn" data-i18n="btn_simulate_sale">Simulate a sale</button>
+      </div>
+      <div class="alert-banner" id="lowStockBanner">
+        <span class="alert-icon">⚠️</span>
+        <span><span data-i18n="low_stock_prefix">Low stock: only</span> <b id="lowStockNum">3</b> <span data-i18n="low_stock_suffix">units of Mustard Oil 1L remaining</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURE 8: DAILY REPORTS ================= -->
+<section id="reports">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title" data-i18n="s9_title">Know exactly what sold, every single day</h2>
+      <p class="section-desc" data-i18n="s9_desc">A day-wise breakdown of every product sold — units, revenue, and trend versus the day before — so restocking and pricing are never a guess.</p>
+    </div>
+
+    <div class="reveal">
+      <div class="report-toolbar">
+        <div class="day-tabs" id="dayTabs"></div>
+        <button class="btn" id="downloadReportBtn" data-i18n="btn_download_report">⬇ Download CSV report</button>
+      </div>
+
+      <div class="report-stat-grid">
+        <div class="stat-card"><div class="stat-label" data-i18n="report_items_sold">Items sold that day</div><div class="stat-value teal" id="reportItemsSold">—</div></div>
+        <div class="stat-card"><div class="stat-label" data-i18n="report_revenue">Revenue that day</div><div class="stat-value" id="reportRevenue">—</div></div>
+        <div class="stat-card"><div class="stat-label" data-i18n="report_top_product">Top product</div><div class="stat-value" id="reportTopProduct" style="font-size:17px;">—</div></div>
+      </div>
+
+      <div class="panel">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th data-i18n="report_col_product">Product</th>
+              <th data-i18n="report_col_units">Units sold</th>
+              <th data-i18n="report_col_revenue">Revenue</th>
+              <th data-i18n="report_col_trend">Trend vs. prev. day</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody"></tbody>
+        </table>
+      </div>
+      <div class="report-foot">
+        <span class="report-note" data-i18n="report_note">Every completed order updates this report automatically — no manual counting at closing time.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CUSTOMER EXPERIENCE ==================
+     Feature kept intentionally out of the visible page per request.
+     The underlying behaviour (no forced customer registration) is
+     still live in the actual order flow — phone/address is collected
+     inline at checkout with no account creation required. This section
+     is left here, commented out, in case it needs to be shown again.
+
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2 class="section-title" data-i18n="s8_title">Registration should never block a purchase</h2>
+      <p class="section-desc" data-i18n="s8_desc">Customer accounts stay optional. Fewer steps between scanning and ordering means a faster, friendlier checkout every time.</p>
+    </div>
+    <div class="mini-steps reveal">
+      <div class="mini-step" data-i18n="step_scan">📷 Scan QR</div><div class="mini-step-arrow">→</div>
+      <div class="mini-step" data-i18n="step_open">🏪 Open shop</div><div class="mini-step-arrow">→</div>
+      <div class="mini-step" data-i18n="step_select">🛒 Select products</div><div class="mini-step-arrow">→</div>
+      <div class="mini-step" data-i18n="step_phone">📱 Enter phone / address</div><div class="mini-step-arrow">→</div>
+      <div class="mini-step" data-i18n="step_place">✅ Place order</div>
+    </div>
+    <div class="callout reveal">
+      <span>💡</span>
+      <span data-i18n="callout_text">No compulsory sign-up, no password to remember — a returning customer scans and orders again in seconds, exactly like walking up to the same counter.</span>
+    </div>
+  </div>
+</section>
+================================================================ -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="foot-brand">Smart Vyapar</div>
+      <div class="foot-line" data-i18n="foot_line">Helping small offline vendors go digital with UPI, QR codes, and a lightweight storefront — no app download required for the customer.</div>
+    </div>
+    <ul class="foot-list">
+      <li data-i18n="foot_shop">🏪 Shop setup</li>
+      <li data-i18n="foot_products">📦 Product catalogue</li>
+      <li data-i18n="foot_orders">🧾 Order management</li>
+      <li data-i18n="foot_qr">🔲 QR shop</li>
+      <li data-i18n="foot_payment">💳 UPI payment</li>
+      <li data-i18n="foot_dashboard">📊 Sales dashboard</li>
+      <li data-i18n="foot_stock">⚠️ Stock alerts</li>
+    </ul>
+  </div>
+  <div class="wrap foot-bottom">
+    <span data-i18n="foot_copyright">© 2026 Smart Vyapar. All rights reserved.</span>
+    <span data-i18n="foot_tagline">Made for India's local shops.</span>
+  </div>
+</footer>
+
+<script>
+/* ---------- i18n (regional language support) ---------- */
+const translations = {
+  en: {
+    nav_tagline:"Vendor → QR → Customer", nav_shop:"Shop", nav_products:"Products", nav_orders:"Orders",
+    nav_qr:"QR", nav_payment:"Payment", nav_dashboard:"Dashboard", nav_alerts:"Alerts", nav_reports:"Reports", nav_cta:"Start free",
+    hero_eyebrow:"Built for the corner shop, not the megastore",
+    hero_headline:'Every small vendor <span class="under">deserves</span> a shop the whole street can <span class="accent">scan into.</span>',
+    hero_sub:"One QR code turns any counter, cart, or shutter into a full online store — products, orders, UPI payments, and stock, all in a dashboard the vendor already knows how to run: like a ledger, just faster.",
+    hero_cta1:"Set up my shop", hero_cta2:"Explore features ↓",
+    trust1:"Coding required", trust2:"QR code per shop", trust3:"Payments built in",
+    s1_tag:"Shop Setup", s1_title:"Create your online shop",
+    s1_desc:"The vendor fills a short form — shop name, logo, location, timings, contact — and the storefront builds itself. No coding, no designer, no waiting.",
+    label_shopname:"Shop name", label_logo:"Logo", label_logo_upload:"🖼️ Tap to upload shop logo",
+    label_location:"Location", label_contact:"Contact number", label_opens:"Opens", label_closes:"Closes",
+    label_category:"Category", opt_grocery:"Grocery & Kirana", opt_bakery:"Bakery", opt_pharmacy:"Pharmacy", opt_stationery:"Stationery",
+    btn_publish:"Publish my shop →", preview_caption:"↑ live preview, updates as the vendor types",
+    s2_tag:"Product Catalogue", s2_title:"Add products once, sell to everyone",
+    s2_desc:"Each product carries an image, name, price, description, stock, and category. Customers browse the same catalogue the vendor manages — switch the view to see both sides.",
+    toggle_customer:"👀 Customer view", toggle_vendor:"🧑‍💼 Vendor view",
+    label_left:"left", label_instock:"in stock", btn_edit:"Edit", btn_addcart:"🛒 Add to cart",
+    s3_tag:"Order Management", s3_title:'From "New" to "Delivered" — nothing gets lost',
+    s3_desc:'A customer places an order and it lands straight on the vendor\'s dashboard. Click "Move forward →" on any card to push it through the flow.',
+    stage_new:"New", stage_accepted:"Accepted", stage_preparing:"Preparing", stage_ready:"Ready", stage_delivered:"Delivered",
+    btn_moveforward:"Move forward →",
+    s4_tag:"QR Shop", s4_title:"One code. Every vendor. Instant shop.",
+    s4_desc:"Every vendor gets a unique QR code the moment their shop is published. A customer scans it, and the vendor's online shop opens directly — no app to install, no search required.",
+    s4_sub:"Especially useful for small local vendors — the code goes wherever the shop already lives:",
+    qr_counter:"🧾 the counter", qr_packaging:"📦 packaging", qr_banner:"🪧 a banner", qr_shutter:"🚪 the shutter",
+    qr_prompt:"Tap the code to simulate a customer scan →", qr_scanning:"Scanning…",
+    qr_scanned:"✅ Scanned — Sharma Kirana Store's shop just opened on the customer's phone.",
+    s5_tag:"Digital Payment", s5_title:"UPI-first checkout, no gateway required",
+    s5_desc:"Vendors add their UPI ID or QR, and customers pick a digital payment option at checkout — quick, familiar, and cash-optional.",
+    pay_upi:"Pay via UPI", pay_qr:"Scan vendor's QR", pay_qr_sub:"GPay · PhonePe · Paytm",
+    pay_cod:"Cash on delivery", pay_cod_sub:"Pay when it arrives",
+    btn_confirm:"Confirm payment · ₹743", pay_confirming:"⏳ Confirming…",
+    pay_confirmed_prefix:"✅ Payment confirmed via", pay_confirmed_suffix:"· Order sent to vendor",
+    s6_tag:"Sales Dashboard", s6_title:"Everything a vendor needs to check in ten seconds",
+    s6_desc:"Today's sales, total and pending orders, best-sellers, and the monthly trend — one screen, one glance.",
+    stat_today:"Today's sales", stat_total:"Total orders", stat_pending:"Pending orders", stat_monthly:"Monthly sales",
+    chart_week:"Sales this week (₹ '00s)", day_mon:"Mon", day_tue:"Tue", day_wed:"Wed", day_thu:"Thu", day_fri:"Fri", day_sat:"Sat", day_sun:"Sun",
+    best_sellers:"Best-selling products",
+    s7_tag:"Stock Alerts", s7_title:"A nudge before the shelf goes empty",
+    s7_desc:'When stock reaches a defined minimum, the dashboard raises a flag automatically — so restocking happens before a customer ever hits "out of stock."',
+    stock_label:"Mustard Oil 1L — units left", btn_simulate_sale:"Simulate a sale", btn_out_of_stock:"Out of stock",
+    low_stock_prefix:"Low stock: only", low_stock_suffix:"units of Mustard Oil 1L remaining",
+    s8_tag:"Customer Experience", s8_title:"Registration should never block a purchase",
+    s8_desc:"Customer accounts stay optional. Fewer steps between scanning and ordering means a faster, friendlier checkout every time.",
+    step_scan:"📷 Scan QR", step_open:"🏪 Open shop", step_select:"🛒 Select products",
+    step_phone:"📱 Enter phone / address", step_place:"✅ Place order",
+    callout_text:"No compulsory sign-up, no password to remember — a returning customer scans and orders again in seconds, exactly like walking up to the same counter.",
+    s9_tag:"Daily Reports", s9_title:"Know exactly what sold, every single day",
+    s9_desc:"A day-wise breakdown of every product sold — units, revenue, and trend versus the day before — so restocking and pricing are never a guess.",
+    btn_download_report:"⬇ Download CSV report",
+    report_items_sold:"Items sold that day", report_revenue:"Revenue that day", report_top_product:"Top product",
+    report_col_product:"Product", report_col_units:"Units sold", report_col_revenue:"Revenue", report_col_trend:"Trend vs. prev. day",
+    report_note:"Every completed order updates this report automatically — no manual counting at closing time.",
+    report_trend_up:"▲ up", report_trend_down:"▼ down", report_trend_flat:"– flat", report_trend_na:"—",
+    report_top_badge:"TOP",
+    foot_line:"Helping small offline vendors go digital with UPI, QR codes, and a lightweight storefront — no app download required for the customer.",
+    foot_shop:"🏪 Shop setup", foot_products:"📦 Product catalogue", foot_orders:"🧾 Order management",
+    foot_qr:"🔲 QR shop", foot_payment:"💳 UPI payment", foot_dashboard:"📊 Sales dashboard", foot_stock:"⚠️ Stock alerts",
+    foot_copyright:"© 2026 Smart Vyapar. All rights reserved.", foot_tagline:"Made for India's local shops."
+  },
+  hi: {
+    nav_tagline:"विक्रेता → QR → ग्राहक", nav_shop:"दुकान", nav_products:"उत्पाद", nav_orders:"ऑर्डर",
+    nav_qr:"QR", nav_payment:"भुगतान", nav_dashboard:"डैशबोर्ड", nav_alerts:"अलर्ट", nav_reports:"रिपोर्ट", nav_cta:"मुफ़्त शुरू करें",
+    hero_eyebrow:"बड़े मॉल के लिए नहीं, गली की दुकान के लिए बना",
+    hero_headline:'हर छोटे दुकानदार को <span class="under">मिलनी चाहिए</span> ऐसी दुकान, जिसे पूरी गली <span class="accent">स्कैन करके खोल सके।</span>',
+    hero_sub:"एक QR कोड किसी भी काउंटर, ठेले या शटर को पूरी ऑनलाइन दुकान बना देता है — उत्पाद, ऑर्डर, UPI भुगतान और स्टॉक, सब एक ही डैशबोर्ड में, जैसे बही-खाता — बस तेज़।",
+    hero_cta1:"मेरी दुकान बनाएं", hero_cta2:"सुविधाएं देखें ↓",
+    trust1:"कोडिंग की ज़रूरत नहीं", trust2:"हर दुकान का एक QR कोड", trust3:"भुगतान पहले से जुड़ा",
+    s1_tag:"दुकान सेटअप", s1_title:"अपनी ऑनलाइन दुकान बनाएं",
+    s1_desc:"दुकानदार एक छोटा फॉर्म भरता है — दुकान का नाम, लोगो, स्थान, समय, संपर्क — और दुकान खुद तैयार हो जाती है। न कोडिंग, न डिज़ाइनर, न इंतज़ार।",
+    label_shopname:"दुकान का नाम", label_logo:"लोगो", label_logo_upload:"🖼️ दुकान का लोगो अपलोड करें",
+    label_location:"स्थान", label_contact:"संपर्क नंबर", label_opens:"खुलने का समय", label_closes:"बंद होने का समय",
+    label_category:"श्रेणी", opt_grocery:"किराना", opt_bakery:"बेकरी", opt_pharmacy:"मेडिकल स्टोर", opt_stationery:"स्टेशनरी",
+    btn_publish:"मेरी दुकान प्रकाशित करें →", preview_caption:"↑ लाइव प्रीव्यू, टाइप करते ही बदलता है",
+    s2_tag:"उत्पाद सूची", s2_title:"उत्पाद एक बार जोड़ें, सबको बेचें",
+    s2_desc:"हर उत्पाद में तस्वीर, नाम, कीमत, विवरण, स्टॉक और श्रेणी होती है। ग्राहक वही सूची देखते हैं जो दुकानदार संभालता है — दोनों तरफ का नज़ारा देखने के लिए व्यू बदलें।",
+    toggle_customer:"👀 ग्राहक व्यू", toggle_vendor:"🧑‍💼 दुकानदार व्यू",
+    label_left:"बचे", label_instock:"स्टॉक में", btn_edit:"बदलें", btn_addcart:"🛒 कार्ट में डालें",
+    s3_tag:"ऑर्डर प्रबंधन", s3_title:'"नया" से "डिलीवर" तक — कुछ भी नहीं छूटता',
+    s3_desc:'ग्राहक ऑर्डर करता है और वह सीधे दुकानदार के डैशबोर्ड पर पहुंचता है। किसी भी कार्ड पर "आगे बढ़ाएं →" दबाकर उसे अगले चरण में ले जाएं।',
+    stage_new:"नया", stage_accepted:"स्वीकृत", stage_preparing:"तैयार हो रहा", stage_ready:"तैयार", stage_delivered:"डिलीवर",
+    btn_moveforward:"आगे बढ़ाएं →",
+    s4_tag:"QR दुकान", s4_title:"एक कोड। हर दुकानदार। तुरंत दुकान।",
+    s4_desc:"दुकान प्रकाशित होते ही हर दुकानदार को अपना अलग QR कोड मिलता है। ग्राहक उसे स्कैन करता है और दुकानदार की ऑनलाइन दुकान सीधे खुल जाती है — न कोई ऐप, न कोई खोजबीन।",
+    s4_sub:"छोटे स्थानीय दुकानदारों के लिए खास तौर पर उपयोगी — यह कोड वहीं लगता है जहां दुकान पहले से मौजूद है:",
+    qr_counter:"🧾 काउंटर पर", qr_packaging:"📦 पैकेजिंग पर", qr_banner:"🪧 बैनर पर", qr_shutter:"🚪 शटर पर",
+    qr_prompt:"ग्राहक के स्कैन को आज़माने के लिए कोड पर टैप करें →", qr_scanning:"स्कैन हो रहा है…",
+    qr_scanned:"✅ स्कैन हो गया — शर्मा किराना स्टोर की दुकान अभी ग्राहक के फोन पर खुल गई।",
+    s5_tag:"डिजिटल भुगतान", s5_title:"UPI से सीधा भुगतान, किसी गेटवे की ज़रूरत नहीं",
+    s5_desc:"दुकानदार अपनी UPI आईडी या QR जोड़ता है, और ग्राहक चेकआउट पर डिजिटल भुगतान का विकल्प चुनता है — तेज़, जाना-पहचाना और नकद भी उपलब्ध।",
+    pay_upi:"UPI से भुगतान करें", pay_qr:"दुकानदार का QR स्कैन करें", pay_qr_sub:"GPay · PhonePe · Paytm",
+    pay_cod:"डिलीवरी पर नकद", pay_cod_sub:"सामान आने पर भुगतान करें",
+    btn_confirm:"भुगतान की पुष्टि करें · ₹743", pay_confirming:"⏳ पुष्टि हो रही है…",
+    pay_confirmed_prefix:"✅ भुगतान की पुष्टि हुई", pay_confirmed_suffix:"· ऑर्डर दुकानदार को भेजा गया",
+    s6_tag:"बिक्री डैशबोर्ड", s6_title:"दस सेकंड में दुकानदार को पूरी जानकारी",
+    s6_desc:"आज की बिक्री, कुल और लंबित ऑर्डर, सबसे ज़्यादा बिकने वाले उत्पाद और मासिक रुझान — सब एक ही स्क्रीन पर।",
+    stat_today:"आज की बिक्री", stat_total:"कुल ऑर्डर", stat_pending:"लंबित ऑर्डर", stat_monthly:"मासिक बिक्री",
+    chart_week:"इस हफ़्ते की बिक्री (₹ '00 में)", day_mon:"सोम", day_tue:"मंगल", day_wed:"बुध", day_thu:"गुरु", day_fri:"शुक्र", day_sat:"शनि", day_sun:"रवि",
+    best_sellers:"सबसे ज़्यादा बिकने वाले उत्पाद",
+    s7_tag:"स्टॉक अलर्ट", s7_title:"शेल्फ़ खाली होने से पहले एक इशारा",
+    s7_desc:'जब स्टॉक एक तय सीमा तक पहुंचता है, डैशबोर्ड खुद-ब-खुद अलर्ट दिखा देता है — ताकि ग्राहक के "स्टॉक खत्म" देखने से पहले ही दोबारा भराई हो जाए।',
+    stock_label:"मस्टर्ड ऑयल 1L — बची हुई यूनिट", btn_simulate_sale:"एक बिक्री आज़माएं", btn_out_of_stock:"स्टॉक खत्म",
+    low_stock_prefix:"कम स्टॉक: सिर्फ़", low_stock_suffix:"मस्टर्ड ऑयल 1L की यूनिट बची हैं",
+    s8_tag:"ग्राहक अनुभव", s8_title:"रजिस्ट्रेशन कभी खरीद में रुकावट नहीं बनना चाहिए",
+    s8_desc:"ग्राहक खाता वैकल्पिक ही रहता है। स्कैन करने और ऑर्डर करने के बीच जितने कम कदम होंगे, चेकआउट उतना ही तेज़ और आसान होगा।",
+    step_scan:"📷 QR स्कैन करें", step_open:"🏪 दुकान खोलें", step_select:"🛒 उत्पाद चुनें",
+    step_phone:"📱 फोन / पता डालें", step_place:"✅ ऑर्डर करें",
+    callout_text:"कोई अनिवार्य साइन-अप नहीं, याद रखने के लिए कोई पासवर्ड नहीं — पुराना ग्राहक स्कैन करके सेकंडों में फिर ऑर्डर कर सकता है, बिल्कुल उसी काउंटर पर जाने जैसा।",
+    s9_tag:"दैनिक रिपोर्ट", s9_title:"हर दिन क्या बिका, यह बिल्कुल साफ़ जानें",
+    s9_desc:"हर उत्पाद की दिन-वार जानकारी — कितनी यूनिट बिकीं, कितनी कमाई हुई, और पिछले दिन की तुलना में रुझान — ताकि दोबारा स्टॉक भरना और कीमत तय करना अंदाज़े पर न हो।",
+    btn_download_report:"⬇ CSV रिपोर्ट डाउनलोड करें",
+    report_items_sold:"उस दिन बिके आइटम", report_revenue:"उस दिन की कमाई", report_top_product:"सबसे ज़्यादा बिकने वाला उत्पाद",
+    report_col_product:"उत्पाद", report_col_units:"बिकी यूनिट", report_col_revenue:"कमाई", report_col_trend:"पिछले दिन से रुझान",
+    report_note:"हर पूरा हुआ ऑर्डर इस रिपोर्ट को अपने आप अपडेट कर देता है — दुकान बंद करते समय हाथ से गिनने की ज़रूरत नहीं।",
+    report_trend_up:"▲ ऊपर", report_trend_down:"▼ नीचे", report_trend_flat:"– स्थिर", report_trend_na:"—",
+    report_top_badge:"टॉप",
+    foot_line:"UPI, QR कोड और एक हल्के-फुल्के स्टोरफ्रंट के साथ छोटे ऑफलाइन दुकानदारों को डिजिटल बनाने में मदद — ग्राहक को कोई ऐप डाउनलोड करने की ज़रूरत नहीं।",
+    foot_shop:"🏪 दुकान सेटअप", foot_products:"📦 उत्पाद सूची", foot_orders:"🧾 ऑर्डर प्रबंधन",
+    foot_qr:"🔲 QR दुकान", foot_payment:"💳 UPI भुगतान", foot_dashboard:"📊 बिक्री डैशबोर्ड", foot_stock:"⚠️ स्टॉक अलर्ट",
+    foot_copyright:"© 2026 स्मार्ट व्यापार। सर्वाधिकार सुरक्षित।", foot_tagline:"भारत की स्थानीय दुकानों के लिए बनाया गया।"
+  },
+  mr: {
+    nav_tagline:"विक्रेता → QR → ग्राहक", nav_shop:"दुकान", nav_products:"उत्पादने", nav_orders:"ऑर्डर",
+    nav_qr:"QR", nav_payment:"पेमेंट", nav_dashboard:"डॅशबोर्ड", nav_alerts:"अलर्ट", nav_reports:"अहवाल", nav_cta:"मोफत सुरू करा",
+    hero_eyebrow:"मोठ्या मॉलसाठी नाही, कोपऱ्यावरच्या दुकानासाठी बनवलेलं",
+    hero_headline:'प्रत्येक छोट्या विक्रेत्याला <span class="under">हवी</span> अशी दुकान, जी संपूर्ण गल्ली <span class="accent">स्कॅन करून उघडू शकेल.</span>',
+    hero_sub:"एक QR कोड कोणत्याही काउंटर, गाडा किंवा शटरला संपूर्ण ऑनलाइन दुकानात बदलतो — उत्पादने, ऑर्डर, UPI पेमेंट आणि स्टॉक, सगळं एका डॅशबोर्डवर, जणू वहीच — फक्त जलद.",
+    hero_cta1:"माझी दुकान सुरू करा", hero_cta2:"वैशिष्ट्ये पहा ↓",
+    trust1:"कोडिंगची गरज नाही", trust2:"प्रत्येक दुकानाला एक QR कोड", trust3:"पेमेंट आधीच जोडलेलं",
+    s1_tag:"दुकान सेटअप", s1_title:"तुमची ऑनलाइन दुकान तयार करा",
+    s1_desc:"विक्रेता एक छोटा फॉर्म भरतो — दुकानाचं नाव, लोगो, ठिकाण, वेळा, संपर्क — आणि दुकान आपोआप तयार होते. कोडिंग नाही, डिझायनर नाही, वाट पाहावी लागत नाही.",
+    label_shopname:"दुकानाचं नाव", label_logo:"लोगो", label_logo_upload:"🖼️ दुकानाचा लोगो अपलोड करा",
+    label_location:"ठिकाण", label_contact:"संपर्क क्रमांक", label_opens:"उघडण्याची वेळ", label_closes:"बंद होण्याची वेळ",
+    label_category:"प्रकार", opt_grocery:"किराणा", opt_bakery:"बेकरी", opt_pharmacy:"मेडिकल", opt_stationery:"स्टेशनरी",
+    btn_publish:"माझी दुकान प्रकाशित करा →", preview_caption:"↑ थेट प्रीव्ह्यू, टाइप करताच बदलतो",
+    s2_tag:"उत्पादन यादी", s2_title:"उत्पादने एकदा जोडा, सर्वांना विका",
+    s2_desc:"प्रत्येक उत्पादनाला फोटो, नाव, किंमत, वर्णन, स्टॉक आणि प्रकार असतो. ग्राहक तीच यादी पाहतात जी विक्रेता सांभाळतो — दोन्ही बाजू पाहण्यासाठी व्ह्यू बदला.",
+    toggle_customer:"👀 ग्राहक व्ह्यू", toggle_vendor:"🧑‍💼 विक्रेता व्ह्यू",
+    label_left:"शिल्लक", label_instock:"स्टॉकमध्ये", btn_edit:"बदला", btn_addcart:"🛒 कार्टमध्ये टाका",
+    s3_tag:"ऑर्डर व्यवस्थापन", s3_title:'"नवीन" पासून "डिलिव्हर" पर्यंत — काहीही हरवत नाही',
+    s3_desc:'ग्राहक ऑर्डर देतो आणि ती थेट विक्रेत्याच्या डॅशबोर्डवर पोहोचते. कोणत्याही कार्डवरील "पुढे न्या →" दाबून ती पुढच्या टप्प्यात न्या.',
+    stage_new:"नवीन", stage_accepted:"स्वीकारलं", stage_preparing:"तयार होतंय", stage_ready:"तयार", stage_delivered:"डिलिव्हर",
+    btn_moveforward:"पुढे न्या →",
+    s4_tag:"QR दुकान", s4_title:"एक कोड. प्रत्येक विक्रेता. तात्काळ दुकान.",
+    s4_desc:"दुकान प्रकाशित होताच प्रत्येक विक्रेत्याला स्वतःचा वेगळा QR कोड मिळतो. ग्राहक तो स्कॅन करतो आणि विक्रेत्याचं ऑनलाइन दुकान थेट उघडतं — कोणतंही अ‍ॅप नाही, शोधाशोध नाही.",
+    s4_sub:"छोट्या स्थानिक विक्रेत्यांसाठी खास उपयुक्त — हा कोड दुकान जिथे आहे तिथेच लावता येतो:",
+    qr_counter:"🧾 काउंटरवर", qr_packaging:"📦 पॅकेजिंगवर", qr_banner:"🪧 बॅनरवर", qr_shutter:"🚪 शटरवर",
+    qr_prompt:"ग्राहकाचं स्कॅन कसं दिसेल हे पाहण्यासाठी कोडवर टॅप करा →", qr_scanning:"स्कॅन होतंय…",
+    qr_scanned:"✅ स्कॅन झालं — शर्मा किराणा स्टोअरचं दुकान ग्राहकाच्या फोनवर उघडलं.",
+    s5_tag:"डिजिटल पेमेंट", s5_title:"UPI-आधारित चेकआउट, गेटवेची गरज नाही",
+    s5_desc:"विक्रेता त्याचा UPI आयडी किंवा QR जोडतो, आणि ग्राहक चेकआउटच्या वेळी डिजिटल पेमेंट पर्याय निवडतो — जलद, ओळखीचं आणि रोखीचाही पर्याय.",
+    pay_upi:"UPI ने पेमेंट करा", pay_qr:"विक्रेत्याचा QR स्कॅन करा", pay_qr_sub:"GPay · PhonePe · Paytm",
+    pay_cod:"डिलिव्हरीच्या वेळी रोख", pay_cod_sub:"सामान आल्यावर पैसे द्या",
+    btn_confirm:"पेमेंट निश्चित करा · ₹743", pay_confirming:"⏳ निश्चित होतंय…",
+    pay_confirmed_prefix:"✅ पेमेंट निश्चित झालं", pay_confirmed_suffix:"· ऑर्डर विक्रेत्याला पाठवली",
+    s6_tag:"विक्री डॅशबोर्ड", s6_title:"दहा सेकंदात विक्रेत्याला हवी ती सगळी माहिती",
+    s6_desc:"आजची विक्री, एकूण आणि प्रलंबित ऑर्डर, सर्वाधिक विकली जाणारी उत्पादने आणि मासिक कल — सगळं एकाच स्क्रीनवर.",
+    stat_today:"आजची विक्री", stat_total:"एकूण ऑर्डर", stat_pending:"प्रलंबित ऑर्डर", stat_monthly:"मासिक विक्री",
+    chart_week:"या आठवड्याची विक्री (₹ '00 मध्ये)", day_mon:"सोम", day_tue:"मंगळ", day_wed:"बुध", day_thu:"गुरु", day_fri:"शुक्र", day_sat:"शनि", day_sun:"रवि",
+    best_sellers:"सर्वाधिक विकली जाणारी उत्पादने",
+    s7_tag:"स्टॉक अलर्ट", s7_title:"शेल्फ रिकामी होण्याआधी एक इशारा",
+    s7_desc:'स्टॉक ठरलेल्या मर्यादेपर्यंत पोहोचला की डॅशबोर्ड आपोआप इशारा दाखवतो — जेणेकरून ग्राहकाला "स्टॉक संपला" दिसण्याआधीच पुन्हा भरून घेता येईल.',
+    stock_label:"मस्टर्ड ऑइल 1L — शिल्लक युनिट्स", btn_simulate_sale:"एक विक्री करून पहा", btn_out_of_stock:"स्टॉक संपला",
+    low_stock_prefix:"कमी स्टॉक: फक्त", low_stock_suffix:"मस्टर्ड ऑइल 1L च्या युनिट्स शिल्लक",
+    s8_tag:"ग्राहक अनुभव", s8_title:"नोंदणीमुळे कधीही खरेदी अडकता कामा नये",
+    s8_desc:"ग्राहक खातं ऐच्छिकच राहतं. स्कॅन करणं आणि ऑर्डर करणं यामधील पायऱ्या जितक्या कमी, चेकआउट तितकाच जलद आणि सोपा.",
+    step_scan:"📷 QR स्कॅन करा", step_open:"🏪 दुकान उघडा", step_select:"🛒 उत्पादने निवडा",
+    step_phone:"📱 फोन / पत्ता टाका", step_place:"✅ ऑर्डर द्या",
+    callout_text:"कोणतीही सक्तीची नोंदणी नाही, लक्षात ठेवायला पासवर्ड नाही — जुना ग्राहक स्कॅन करून काही सेकंदांत पुन्हा ऑर्डर करू शकतो, अगदी त्याच काउंटरवर गेल्यासारखं.",
+    s9_tag:"दैनिक अहवाल", s9_title:"रोज नेमकं काय विकलं गेलं, अगदी स्पष्ट कळू द्या",
+    s9_desc:"प्रत्येक उत्पादनाची दिवसनिहाय माहिती — किती युनिट्स विकली, किती कमाई झाली, आणि आदल्या दिवसाच्या तुलनेत कल — त्यामुळे पुन्हा स्टॉक भरणं आणि किंमत ठरवणं अंदाजावर राहत नाही.",
+    btn_download_report:"⬇ CSV अहवाल डाउनलोड करा",
+    report_items_sold:"त्या दिवशी विकलेल्या वस्तू", report_revenue:"त्या दिवशीची कमाई", report_top_product:"सर्वाधिक विकलं गेलेलं उत्पादन",
+    report_col_product:"उत्पादन", report_col_units:"विकलेली युनिट्स", report_col_revenue:"कमाई", report_col_trend:"आदल्या दिवसाच्या तुलनेत कल",
+    report_note:"प्रत्येक पूर्ण झालेली ऑर्डर हा अहवाल आपोआप अपडेट करते — दुकान बंद करताना हाताने मोजण्याची गरज नाही.",
+    report_trend_up:"▲ वाढ", report_trend_down:"▼ घट", report_trend_flat:"– स्थिर", report_trend_na:"—",
+    report_top_badge:"टॉप",
+    foot_line:"UPI, QR कोड आणि एका हलक्याफुलक्या स्टोअरफ्रंटच्या मदतीने छोट्या ऑफलाइन विक्रेत्यांना डिजिटल बनवणं — ग्राहकाला कोणतंही अ‍ॅप डाउनलोड करावं लागत नाही.",
+    foot_shop:"🏪 दुकान सेटअप", foot_products:"📦 उत्पादन यादी", foot_orders:"🧾 ऑर्डर व्यवस्थापन",
+    foot_qr:"🔲 QR दुकान", foot_payment:"💳 UPI पेमेंट", foot_dashboard:"📊 विक्री डॅशबोर्ड", foot_stock:"⚠️ स्टॉक अलर्ट",
+    foot_copyright:"© 2026 स्मार्ट व्यापार. सर्व हक्क राखीव.", foot_tagline:"भारतातील स्थानिक दुकानांसाठी खास बनवलेलं."
+  }
+};
+let currentLang = 'en';
+function t(key){ return (translations[currentLang] && translations[currentLang][key]) || translations.en[key] || key; }
+function applyTranslations(){
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.dataset.i18n;
+    if(el.tagName === 'OPTION' || el.tagName === 'SPAN' || el.tagName === 'DIV' || el.tagName === 'LABEL' || el.tagName === 'BUTTON' || el.tagName === 'A' || el.tagName === 'LI' || el.tagName === 'B' || el.tagName === 'P' || el.tagName === 'H2' || el.tagName === 'SMALL'){
+      el.textContent = t(key);
+    } else {
+      el.textContent = t(key);
+    }
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    el.innerHTML = t(el.dataset.i18nHtml);
+  });
+  renderProducts(); applyMode(); renderOrders(); refreshStock();
+  qrCaption.textContent = t('qr_prompt');
+  buildDayTabs(); renderReport(selectedDayIdx);
+}
+const langSwitch = document.getElementById('langSwitch');
+langSwitch.addEventListener('click', (e)=>{
+  if(e.target.tagName !== 'BUTTON') return;
+  currentLang = e.target.dataset.lang;
+  langSwitch.querySelectorAll('.lang-btn').forEach(b=> b.classList.toggle('active', b.dataset.lang===currentLang));
+  applyTranslations();
+});
+langSwitch.querySelector(`[data-lang="${currentLang}"]`).classList.add('active');
+
+/* ---------- scroll reveal ---------- */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); } });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- products (feature 2) ---------- */
+const products = [
+  {emoji:'🍚', name:'Basmati Rice 5kg', desc:'Aged, long grain', price:520, stock:24, cat:'Grains'},
+  {emoji:'🧴', name:'Mustard Oil 1L', desc:'Cold pressed', price:165, stock:12, cat:'Cooking'},
+  {emoji:'🍪', name:'Glucose Biscuits', desc:'Family pack, 800g', price:30, stock:3, cat:'Snacks'},
+  {emoji:'🧂', name:'Tata Salt 1kg', desc:'Iodised', price:28, stock:40, cat:'Essentials'},
+  {emoji:'🥛', name:'Toned Milk 1L', desc:'Delivered fresh daily', price:58, stock:8, cat:'Dairy'},
+  {emoji:'🍞', name:'Bread Loaf', desc:'Baked this morning', price:45, stock:2, cat:'Bakery'},
+];
+const prodGrid = document.getElementById('prodGrid');
+function renderProducts(){
+  prodGrid.innerHTML = '';
+  products.forEach((p,idx)=>{
+    const low = p.stock <= 5;
+    const card = document.createElement('div');
+    card.className = 'prod-card';
+    card.innerHTML = `
+      <div class="prod-img">${p.emoji}</div>
+      <div class="prod-body">
+        <div class="prod-cat">${p.cat}</div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-desc">${p.desc}</div>
+        <div class="prod-foot">
+          <div class="prod-price">₹${p.price}</div>
+          <div class="prod-stock ${low?'low':''}">${p.stock} ${t('label_left')}</div>
+        </div>
+        <div class="vendor-only" style="margin-top:10px;">
+          <button class="cart-btn">${t('btn_edit')}</button>
+        </div>
+        <div class="stock-editor">
+          <button data-i="${idx}" data-d="-1">−</button>
+          <span>${p.stock} ${t('label_instock')}</span>
+          <button data-i="${idx}" data-d="1">+</button>
+        </div>
+        <div class="vendor-only" style="display:none;"></div>
+        <div style="margin-top:10px;" class="customer-only">
+          <button class="cart-btn" style="width:100%;">${t('btn_addcart')}</button>
+        </div>
+      </div>
+    `;
+    prodGrid.appendChild(card);
+  });
+  prodGrid.querySelectorAll('.stock-editor button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = +btn.dataset.i, d = +btn.dataset.d;
+      products[i].stock = Math.max(0, products[i].stock + d);
+      renderProducts();
+      applyMode();
+    });
+  });
+}
+const toggle = document.getElementById('viewToggle');
+function applyMode(){
+  const mode = toggle.querySelector('.active').dataset.mode;
+  document.body.classList.toggle('vendor-mode', mode==='vendor');
+  document.querySelectorAll('.customer-only').forEach(el=> el.style.display = mode==='vendor' ? 'none':'block');
+}
+toggle.addEventListener('click', (e)=>{
+  if(e.target.tagName !== 'BUTTON') return;
+  toggle.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  applyMode();
+});
+renderProducts();
+applyMode();
+
+/* ---------- orders (feature 3) ---------- */
+const stageKeys = ['stage_new','stage_accepted','stage_preparing','stage_ready','stage_delivered'];
+let orders = [
+  {id:'#1042', items:'Rice 5kg, Salt 1kg', stage:0},
+  {id:'#1043', items:'Mustard Oil, Biscuits', stage:1},
+  {id:'#1044', items:'Bread, Milk 1L', stage:2},
+  {id:'#1045', items:'Rice 5kg x2', stage:3},
+  {id:'#1039', items:'Salt, Oil, Biscuits', stage:4},
+];
+const board = document.getElementById('orderBoard');
+function renderOrders(){
+  board.innerHTML = '';
+  stageKeys.forEach((stageKey, si)=>{
+    const col = document.createElement('div');
+    col.className = 'order-col';
+    const inStage = orders.filter(o=>o.stage===si);
+    col.innerHTML = `<h4>${t(stageKey)} <span>${inStage.length}</span></h4>`;
+    inStage.forEach(o=>{
+      const card = document.createElement('div');
+      card.className = 'order-card' + (si===stageKeys.length-1 ? ' done':'');
+      card.innerHTML = `
+        <div class="oid">${o.id}</div>
+        <div class="oitems">${o.items}</div>
+        ${si < stageKeys.length-1 ? `<button class="oadv" data-id="${o.id}">${t('btn_moveforward')}</button>`:''}
+      `;
+      col.appendChild(card);
+    });
+    board.appendChild(col);
+  });
+  board.querySelectorAll('.oadv').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const o = orders.find(x=>x.id===btn.dataset.id);
+      if(o && o.stage < stageKeys.length-1){ o.stage++; renderOrders(); }
+    });
+  });
+}
+renderOrders();
+
+/* ---------- QR (feature 4) ---------- */
+function buildQR(){
+  const svg = document.getElementById('qrSvg');
+  const size = 29;
+  let cells = '';
+  function isMarker(x,y){
+    const zones = [[0,0],[0,size-7],[size-7,0]];
+    return zones.some(([zx,zy])=> x>=zx && x<zx+7 && y>=zy && y<zy+7);
+  }
+  function markerCell(x,y,zx,zy){
+    const lx=x-zx, ly=y-zy;
+    if(lx===0||lx===6||ly===0||ly===6) return true;
+    if(lx>=2&&lx<=4&&ly>=2&&ly<=4) return true;
+    return false;
+  }
+  let seed = 42;
+  function rnd(){ seed = (seed*1103515245+12345) % 2147483648; return (seed/2147483648); }
+  for(let y=0;y<size;y++){
+    for(let x=0;x<size;x++){
+      let on = false;
+      const zones = [[0,0],[0,size-7],[size-7,0]];
+      const zoneHit = zones.find(([zx,zy])=> x>=zx && x<zx+7 && y>=zy && y<zy+7);
+      if(zoneHit){ on = markerCell(x,y,zoneHit[0],zoneHit[1]); }
+      else{ on = rnd() > 0.56; }
+      if(on){ cells += `<rect x="${x}" y="${y}" width="1" height="1" fill="#22281F"/>`; }
+    }
+  }
+  svg.innerHTML = cells;
+}
+buildQR();
+const qrBox = document.getElementById('qrBox');
+const qrCaption = document.getElementById('qrCaption');
+qrBox.addEventListener('click', ()=>{
+  if(qrBox.classList.contains('scanning')) return;
+  qrBox.classList.add('scanning');
+  qrCaption.textContent = t('qr_scanning');
+  setTimeout(()=>{
+    qrBox.classList.remove('scanning');
+    qrCaption.textContent = t('qr_scanned');
+    document.querySelector('#products').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 1150);
+});
+
+/* ---------- payment (feature 5) ---------- */
+document.querySelectorAll('.pay-opt').forEach(opt=>{
+  opt.addEventListener('click', ()=>{
+    document.querySelectorAll('.pay-opt').forEach(o=>o.classList.remove('selected'));
+    opt.classList.add('selected');
+  });
+});
+document.getElementById('payBtn').addEventListener('click', ()=>{
+  const selected = document.querySelector('.pay-opt.selected .pay-name').textContent;
+  const status = document.getElementById('payStatus');
+  status.textContent = t('pay_confirming');
+  status.classList.add('show');
+  setTimeout(()=>{ status.textContent = `${t('pay_confirmed_prefix')} ${selected} ${t('pay_confirmed_suffix')}`; }, 900);
+});
+
+/* ---------- dashboard bars (feature 6) ---------- */
+const weekly = [32,48,29,55,61,74,40];
+const barsWrap = document.getElementById('bars');
+weekly.forEach(v=>{
+  const bar = document.createElement('div');
+  bar.className='bar';
+  bar.style.height = (v/74*100)+'%';
+  bar.innerHTML = `<span>${v}</span>`;
+  barsWrap.appendChild(bar);
+});
+
+/* ---------- daily reports (feature 8) ---------- */
+const dailySales = [
+  [14, 8, 20, 22, 4, 2],
+  [19, 10, 24, 26, 5, 3],
+  [16, 12, 18, 24, 6, 2],
+  [23, 9, 26, 30, 7, 4],
+  [27, 13, 22, 33, 8, 5],
+  [31, 16, 29, 38, 9, 7],
+  [24, 14, 21, 27, 6, 4],
+];
+let selectedDayIdx = dailySales.length - 1;
+const dayKeyMap = ['day_sun','day_mon','day_tue','day_wed','day_thu','day_fri','day_sat'];
+function buildDayTabs(){
+  const dayTabs = document.getElementById('dayTabs');
+  dayTabs.innerHTML = '';
+  const today = new Date();
+  dailySales.forEach((_, i)=>{
+    const d = new Date(today);
+    d.setDate(today.getDate() - (dailySales.length - 1 - i));
+    const key = dayKeyMap[d.getDay()];
+    const dateLabel = d.toLocaleDateString('en-GB', {day:'2-digit', month:'short'});
+    const btn = document.createElement('button');
+    btn.className = 'day-tab' + (i===selectedDayIdx ? ' active':'');
+    btn.innerHTML = `${t(key)}<span class="d">${dateLabel}</span>`;
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.day-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderReport(i);
+    });
+    dayTabs.appendChild(btn);
+  });
+}
+function renderReport(dayIdx){
+  selectedDayIdx = dayIdx;
+  const sales = dailySales[dayIdx];
+  const prevSales = dayIdx>0 ? dailySales[dayIdx-1] : null;
+  const rows = products.map((p,i)=>({
+    emoji:p.emoji, name:p.name, price:p.price,
+    units: sales[i], revenue: sales[i]*p.price,
+    prevUnits: prevSales ? prevSales[i] : null
+  })).sort((a,b)=>b.units-a.units);
+
+  const totalUnits = rows.reduce((s,r)=>s+r.units,0);
+  const totalRevenue = rows.reduce((s,r)=>s+r.revenue,0);
+  const top = rows[0];
+
+  document.getElementById('reportItemsSold').textContent = totalUnits;
+  document.getElementById('reportRevenue').textContent = '₹' + totalRevenue.toLocaleString('en-IN');
+  document.getElementById('reportTopProduct').textContent = `${top.emoji} ${top.name}`;
+
+  const tbody = document.getElementById('reportTableBody');
+  tbody.innerHTML = '';
+  rows.forEach((r,idx)=>{
+    let trendClass='flat', trendText=t('report_trend_na');
+    if(r.prevUnits!==null){
+      if(r.units>r.prevUnits){ trendClass='up'; trendText=t('report_trend_up'); }
+      else if(r.units<r.prevUnits){ trendClass='down'; trendText=t('report_trend_down'); }
+      else{ trendClass='flat'; trendText=t('report_trend_flat'); }
+    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="report-prod"><span class="em">${r.emoji}</span><span class="nm">${r.name}</span>${idx===0?`<span class="report-top-badge">${t('report_top_badge')}</span>`:''}</div></td>
+      <td class="report-units">${r.units}</td>
+      <td class="report-revenue">₹${r.revenue.toLocaleString('en-IN')}</td>
+      <td class="report-trend ${trendClass}">${trendText}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+document.getElementById('downloadReportBtn').addEventListener('click', ()=>{
+  const sales = dailySales[selectedDayIdx];
+  let csv = 'Product,Units Sold,Revenue (INR)\n';
+  products.forEach((p,i)=>{ csv += `${p.name},${sales[i]},${sales[i]*p.price}\n`; });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `daily-report-${selectedDayIdx+1}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+buildDayTabs();
+renderReport(selectedDayIdx);
+
+/* ---------- low stock (feature 7) ---------- */
+let stock = 12;
+const stockCount = document.getElementById('stockCount');
+const sellBtn = document.getElementById('sellBtn');
+const banner = document.getElementById('lowStockBanner');
+const lowStockNum = document.getElementById('lowStockNum');
+function refreshStock(){
+  stockCount.textContent = stock;
+  stockCount.classList.toggle('low', stock<=5);
+  if(stock<=5){ lowStockNum.textContent = stock; banner.classList.add('show'); }
+  else{ banner.classList.remove('show'); }
+  if(stock<=0){ sellBtn.disabled = true; sellBtn.textContent = t('btn_out_of_stock'); }
+  else{ sellBtn.textContent = t('btn_simulate_sale'); }
+}
+sellBtn.addEventListener('click', ()=>{ if(stock>0){ stock--; refreshStock(); } });
+refreshStock();
+</script>
+<style id="smart-vyapar-app-css">
+#appToast{position:fixed;right:18px;bottom:18px;z-index:9999;background:#22281F;color:#fff;padding:12px 16px;border-radius:10px;font:700 12px monospace;display:none;box-shadow:4px 4px 0 rgba(0,0,0,.15)}
+#cartBar{position:fixed;left:18px;bottom:18px;z-index:9998;background:#F2C94C;color:#22281F;border:2px solid #22281F;border-radius:999px;padding:11px 16px;font:700 12px monospace;cursor:pointer;display:none}
+#checkoutModal{position:fixed;inset:0;background:rgba(20,24,18,.55);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px}
+.checkout-box{background:#fff;border:2px solid #22281F;border-radius:16px;max-width:430px;width:100%;padding:22px;box-shadow:8px 8px 0 rgba(0,0,0,.18)}
+.checkout-box h3{font-size:22px;margin-bottom:14px}.checkout-box input,.checkout-box textarea{width:100%;padding:11px;margin:6px 0 10px;border:1.5px solid #22281F;border-radius:8px;font:14px inherit}.checkout-actions{display:flex;gap:8px;margin-top:8px}.checkout-actions button{flex:1}.cart-items{font:12px monospace;background:#F6F2E9;border-radius:8px;padding:10px;margin-bottom:12px}.cart-items div{display:flex;justify-content:space-between;margin:4px 0}
+</style><div id="cartBar">🛒 Cart <span id="cartCount">0</span> · ₹<span id="cartTotal">0</span></div><div id="appToast"></div><div id="checkoutModal"><div class="checkout-box"><h3>Complete your order</h3><div id="cartItems" class="cart-items"></div><input id="customerName" placeholder="Your name"><input id="customerPhone" placeholder="Phone number"><textarea id="customerAddress" rows="3" placeholder="Delivery address"></textarea><div class="checkout-actions"><button class="btn" id="closeCheckout">Cancel</button><button class="btn dark" id="placeOrder">Place order</button></div></div></div>
+<script id="smart-vyapar-api">
+const API='';
+
+const pathShopId = location.pathname.match(/^\/(?:shop|vendor)\/(\d+)/);
+const queryShopId = new URLSearchParams(location.search).get('shop');
+
+const SHOP_ID = Number(
+  pathShopId?.[1] || queryShopId || 1
+);
+
+const isVendorRoute = location.pathname.startsWith('/vendor/');
+
+let cart=[];
+function generateShopQR() {
+    const qrBox = document.getElementById('qrBox');
+
+    if (!qrBox) return;
+
+    qrBox.innerHTML = '';
+
+    const shopUrl = `${window.location.origin}/shop/${SHOP_ID}`;
+
+    new QRCode(qrBox, {
+        text: shopUrl,
+        width: 220,
+        height: 220,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    const qrCaption = document.getElementById('qrCaption');
+
+    if (qrCaption) {
+        qrCaption.textContent = `Scan to open shop/${SHOP_ID}`;
+    }
+}
+const toast=(m)=>{const x=document.getElementById('appToast');x.textContent=m;x.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.style.display='none',2200)};
+async function api(path,opts={}){const r=await fetch(API+path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.message||'Request failed');return data}
+function money(n){return '₹'+Number(n||0).toLocaleString('en-IN')}
+function updateCart(){const bar=document.getElementById('cartBar');const count=cart.reduce((s,i)=>s+i.quantity,0);const total=cart.reduce((s,i)=>s+i.quantity*i.price,0);bar.style.display=count?'block':'none';document.getElementById('cartCount').textContent=count;document.getElementById('cartTotal').textContent=total}
+function openCheckout(){if(!cart.length){toast('Add a product to the cart first');return}document.getElementById('cartItems').innerHTML=cart.map(i=>`<div><span>${i.name} × ${i.quantity}</span><b>${money(i.price*i.quantity)}</b></div>`).join('')+`<hr><div><b>Total</b><b>${money(cart.reduce((s,i)=>s+i.price*i.quantity,0))}</b></div>`;document.getElementById('checkoutModal').style.display='flex'}
+document.getElementById('cartBar').addEventListener('click',openCheckout);document.getElementById('closeCheckout').addEventListener('click',()=>document.getElementById('checkoutModal').style.display='none');
+async function loadProducts(){const data=await api('/api/products?shop_id='+SHOP_ID);products.splice(0,products.length,...data);renderProducts();applyMode();}
+renderProducts=function(){prodGrid.innerHTML='';products.forEach((p,idx)=>{const low=p.stock<=p.low_stock_limit;const card=document.createElement('div');card.className='prod-card';card.innerHTML=`<div class="prod-img">${p.emoji||'📦'}</div><div class="prod-body"><div class="prod-cat">${p.cat||''}</div><div class="prod-name">${p.name}</div><div class="prod-desc">${p.description||''}</div><div class="prod-foot"><div class="prod-price">₹${p.price}</div><div class="prod-stock ${low?'low':''}">${p.stock} ${t('label_left')}</div></div><div class="vendor-only" style="margin-top:10px"><button class="cart-btn" data-stock="${idx}" data-change="-1">−</button> <button class="cart-btn" data-stock="${idx}" data-change="1">+</button></div><div style="margin-top:10px" class="customer-only"><button class="cart-btn" style="width:100%" data-cart="${idx}">${t('btn_addcart')}</button></div></div>`;prodGrid.appendChild(card)});prodGrid.querySelectorAll('[data-stock]').forEach(b=>b.onclick=async()=>{try{const p=products[+b.dataset.stock];await api('/api/products/'+p.id+'/stock',{method:'PATCH',body:JSON.stringify({change:+b.dataset.change})});await loadProducts();toast('Stock updated')}catch(e){toast(e.message)}});prodGrid.querySelectorAll('[data-cart]').forEach(b=>b.onclick=()=>{const p=products[+b.dataset.cart];const found=cart.find(i=>i.product_id===p.id);if(found)found.quantity++;else cart.push({product_id:p.id,name:p.name,price:p.price,quantity:1});updateCart();toast(p.name+' added to cart')})};
+async function loadShop(){const s=await api('/api/shop/'+SHOP_ID);const box=document.querySelector('#shop-setup .form-mock');const inputs=box.querySelectorAll('input');if(inputs[0])inputs[0].value=s.shop_name;if(inputs[1])inputs[1].value=s.location;if(inputs[2])inputs[2].value=s.contact;if(inputs[3])inputs[3].value=s.opening_time;if(inputs[4])inputs[4].value=s.closing_time;const preview=document.querySelector('#shop-setup .store-card');if(preview){preview.querySelector('.name').textContent=s.shop_name;preview.querySelector('.loc').textContent='📍 '+s.location;const tags=preview.querySelectorAll('.tag');if(tags[0])tags[0].textContent='🕒 '+s.opening_time+' – '+s.closing_time;if(tags[1])tags[1].textContent='📞 '+s.contact;if(tags[2])tags[2].textContent='🛒 '+s.category}window.__shop=s; const qrCaptionEl=document.getElementById('qrCaption'); if(qrCaptionEl) qrCaptionEl.textContent='Scan to open: /shop/'+s.id }
+const publishBtn=document.querySelector('#shop-setup .form-mock .btn.dark');if(publishBtn)publishBtn.addEventListener('click',async()=>{const box=document.querySelector('#shop-setup .form-mock'),i=box.querySelectorAll('input'),sel=box.querySelector('select');try{const s=await api('/api/shops',{method:'POST',body:JSON.stringify({shop_name:i[0].value,location:i[1].value,contact:i[2].value,opening_time:i[3].value,closing_time:i[4].value,category:sel.value})});
+window.__shop = s;
+
+toast('Shop published! Your QR code is ready.');
+
+generateShopQR(s.id);
+
+setTimeout(() => {
+    const qrSection = document.getElementById('qr');
+
+    if (qrSection) {
+        qrSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}, 300);
+document.getElementById('qr').scrollIntoView({ behavior: 'smooth' });}catch(e){toast(e.message)}});
+async function loadOrders(){const data=await api('/api/orders?shop_id='+SHOP_ID);orders.splice(0,orders.length,...data.map(o=>({id:'#'+o.id,items:o.items.map(i=>{const p=products.find(x=>x.id===i.product_id);return (p?p.name:'Product')+(i.quantity>1?' x'+i.quantity:'')}).join(', '),stage:['new','accepted','preparing','ready','delivered'].indexOf(o.order_status),backendId:o.id})));renderOrders()}
+renderOrders=function(){board.innerHTML='';stageKeys.forEach((stageKey,si)=>{const col=document.createElement('div');col.className='order-col';const inStage=orders.filter(o=>o.stage===si);col.innerHTML=`<h4>${t(stageKey)} <span>${inStage.length}</span></h4>`;inStage.forEach(o=>{const c=document.createElement('div');c.className='order-card'+(si===4?' done':'');c.innerHTML=`<div class="oid">${o.id}</div><div class="oitems">${o.items}</div>${si<4?`<button class="oadv" data-id="${o.backendId}" data-next="${['new','accepted','preparing','ready','delivered'][si+1]}">${t('btn_moveforward')}</button>`:''}`;col.appendChild(c)});board.appendChild(col)});board.querySelectorAll('.oadv').forEach(b=>b.onclick=async()=>{try{await api('/api/orders/'+b.dataset.id+'/status',{method:'PATCH',body:JSON.stringify({status:b.dataset.next})});await loadOrders();await loadDashboard();toast('Order moved forward')}catch(e){toast(e.message)}})};
+async function loadDashboard(){const d=await api('/api/dashboard/'+SHOP_ID);const vals=document.querySelectorAll('#dashboard .stat-value');if(vals[0])vals[0].textContent=money(d.todaySales);if(vals[1])vals[1].textContent=d.totalOrders;if(vals[2])vals[2].textContent=d.pendingOrders;if(vals[3])vals[3].textContent=money(d.monthlySales);const list=document.querySelector('#dashboard .best-list');if(list)list.innerHTML=d.bestSellers.map((x,i)=>`<li><span><b>${String(i+1).padStart(2,'0')}</b>${x.product?.name||'Product'}</span><span style="font-family:var(--font-mono)">${x.units} sold</span></li>`).join('');barsWrap.innerHTML='';const max=Math.max(...d.weekly,1);d.weekly.forEach(v=>{const bar=document.createElement('div');bar.className='bar';bar.style.height=(v/max*100)+'%';bar.innerHTML=`<span>${Math.round(v/10)}</span>`;barsWrap.appendChild(bar)})}
+async function loadReport(date){const r=await api('/api/reports/'+SHOP_ID+(date?'?date='+date:''));document.getElementById('reportItemsSold').textContent=r.totalUnits;document.getElementById('reportRevenue').textContent=money(r.revenue);document.getElementById('reportTopProduct').textContent=r.topProduct?(r.topProduct.emoji+' '+r.topProduct.name):'—';const body=document.getElementById('reportTableBody');body.innerHTML=r.rows.map((x,i)=>`<tr><td><div class="report-prod"><span class="em">${x.emoji||'📦'}</span><span class="nm">${x.name}</span>${i===0?'<span class="report-top-badge">TOP</span>':''}</div></td><td class="report-units">${x.units}</td><td class="report-revenue">${money(x.revenue)}</td><td class="report-trend flat">—</td></tr>`).join('')}
+document.getElementById('placeOrder').addEventListener('click',async()=>{try{const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim(),address=document.getElementById('customerAddress').value.trim();if(!name||!phone)return toast('Please enter name and phone');const selected=document.querySelector('.pay-opt.selected')?.dataset.pay||'upi';const o=await api('/api/orders',{method:'POST',body:JSON.stringify({shop_id:SHOP_ID,customer_name:name,customer_phone:phone,customer_address:address,payment_method:selected,items:cart.map(i=>({product_id:i.product_id,quantity:i.quantity}))})});cart=[];updateCart();document.getElementById('checkoutModal').style.display='none';document.getElementById('payStatus').textContent='✅ Order #'+o.id+' placed successfully';document.getElementById('payStatus').classList.add('show');await loadProducts();await loadOrders();await loadDashboard();toast('Order placed successfully') }catch(e){toast(e.message)}});
+const oldPay=document.getElementById('payBtn');oldPay.onclick=null;oldPay.addEventListener('click',openCheckout);
+document.getElementById('downloadReportBtn').onclick=()=>{const date=new Date().toISOString().slice(0,10);window.location.href='/api/reports/'+SHOP_ID+'/csv?date='+date};
+const oldQr=qrBox;oldQr.onclick=()=>{oldQr.classList.add('scanning');qrCaption.textContent=t('qr_scanning');setTimeout(()=>{oldQr.classList.remove('scanning');const id=window.__shop?.id||SHOP_ID;location.href='/shop/'+id;},900)};
+(async()=>{try{await loadShop();await loadProducts();await loadOrders();await loadDashboard();await loadReport(new Date().toISOString().slice(0,10));
+  if (isVendorRoute) {
+    const dashboard = document.getElementById('dashboard');
+
+    if (dashboard) {
+        setTimeout(() => {
+            dashboard.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 500);
+    }
+}
+}catch(e){console.error(e);toast(e.message)}})();
+function generateShopQR(shopId) {
+    const qrBox = document.getElementById('qrBox');
+    const qrCaption = document.getElementById('qrCaption');
+
+    if (!qrBox || !shopId) return;
+
+    qrBox.innerHTML = '';
+
+    const shopUrl = `https://smart-vyapar-rn0v.onrender.com/shop/${shopId}`;
+    new QRCode(qrBox, {
+        text: shopUrl,
+        width: 220,
+        height: 220,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    if (qrCaption) {
+        qrCaption.textContent = `Scan to open shop/${shopId}`;
+    }
+    const qrSection = document.getElementById('qr');
+
+if (qrSection && !document.getElementById('manageShopBtn')) {
+    const btn = document.createElement('button');
+
+    btn.id = 'manageShopBtn';
+    btn.textContent = '⚙️ Manage My Shop';
+
+    btn.style.cssText = `
+        display:block;
+        margin:20px auto 0;
+        padding:12px 24px;
+        border:none;
+        border-radius:25px;
+        background:#22281f;
+        color:white;
+        font-size:16px;
+        font-weight:600;
+        cursor:pointer;
+    `;
+
+    btn.onclick = () => {
+        window.location.href = `/vendor/${shopId}`;
+    };
+
+    qrSection.appendChild(btn);
+}
+}</script></body>
+</html>
