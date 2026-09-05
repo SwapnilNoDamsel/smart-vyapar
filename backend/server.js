@@ -334,4 +334,18 @@ app.use(express.static(frontend));
 app.get('/shop/:id', (req,res)=>res.sendFile(path.join(frontend,'index.html')));
 app.get('*',(req,res)=>res.sendFile(path.join(frontend,'index.html')));
 
-initDatabase().then(()=>app.listen(PORT,()=>console.log(`\nSmart Vyapar running at http://localhost:${PORT}\nMySQL database: ${DB_CONFIG.database}\n`))).catch(err=>{console.error('Startup failed:',err.message);process.exit(1)});
+initDatabase()
+  .then(() => {
+    if (!process.env.VERCEL) {
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Smart Vyapar running at http://localhost:${PORT}`);
+        console.log(`MySQL database: ${DB_CONFIG.database}`);
+      });
+    }
+  })
+  .catch(err => {
+    console.error('Startup failed:', err);
+    process.exit(1);
+  });
+
+module.exports = app;
